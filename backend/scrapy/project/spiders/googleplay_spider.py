@@ -80,12 +80,12 @@ class GooglePlaySpider(CrawlSpider):
         
         cur = conn.cursor()
 
-        sql_name = "SELECT \"ID\" from public.test2 WHERE \"PACKAGE_NAME\"='%s'" % (packageName)
+        sql_name = "SELECT \"ID\" from project WHERE \"package_name\"='%s'" % (packageName)
         cur.execute(sql_name)
         id_name = cur.fetchone()
         
         if id_name:
-            sql_version = "SELECT \"ID\" from public.test2 WHERE \"PACKAGE_NAME\"='%s' AND \"VERSION_APP\"='%s'" % (packageName, version)
+            sql_version = "SELECT \"ID\" from project WHERE \"package_name\"='%s' AND \"version_app\"='%s'" % (packageName, version)
             cur.execute(sql_version)
             id_version = cur.fetchone()
 
@@ -110,7 +110,7 @@ class GooglePlaySpider(CrawlSpider):
         
         cur = conn.cursor()
 
-        sql = "INSERT INTO public.test2(\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") VALUES ('%s','%s', '%s', '%s', '%d', '%s', '%s', '%s', %f, %f, '%s', %f, '%s')" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], int(item["Installs"][0].replace(",","").replace("+","")), item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), float(item["RatingsNumber"][0].replace(",", ".")), item["Category"][0], float(item["Price"][0].replace(" Buy", "").replace("€", "")), item["APK_URL"])
+        sql = "INSERT INTO project(\"package_name\",\"name_app\", \"updated\", \"size_app\", \"installs\", \"version_app\", \"android_min_version\", \"offered_by\", \"ratings\", \"ratings_number\", \"category\", \"price\", \"apk_url\") VALUES ('%s','%s', '%s', '%s', '%d', '%s', '%s', '%s', %f, %f, '%s', %f, '%s')" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], int(item["Installs"][0].replace(",","").replace("+","")), item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), float(item["RatingsNumber"][0].replace(",", ".")), item["Category"][0], float(item["Price"][0].replace(" Buy", "").replace("€", "")), item["APK_URL"])
         cur.execute(sql)
         
         conn.commit()
@@ -126,7 +126,7 @@ class GooglePlaySpider(CrawlSpider):
         
         cur = conn.cursor()
 
-        sql = "UPDATE public.test2 SET (\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") = ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, %f, '%s', %f, '%s')" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), float(item["RatingsNumber"][0].replace(",", ".")), item["Category"][0], float(item["Price"][0].replace(",", ".")), item["APK_URL"])
+        sql = "UPDATE project SET (\"package_name\",\"name_app\", \"updated\", \"size_app\", \"INSTALLS\", \"version_app\", \"android_min_version\", \"offered_by\", \"ratings\", \"ratings_number\", \"category\", \"price\", \"apk_url\") = ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, %f, '%s', %f, '%s')" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), float(item["RatingsNumber"][0].replace(",", ".")), item["Category"][0], float(item["Price"][0].replace(",", ".")), item["APK_URL"])
         cur.execute(sql)
         
         conn.commit()
@@ -143,18 +143,18 @@ class GooglePlaySpider(CrawlSpider):
 # CREATE TABLE public.test1
 # (
 #     "ID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-#     "PACKAGE_NAME" text COLLATE pg_catalog."default",
-#     "NAME_APP" text COLLATE pg_catalog."default",
-#     "UPDATED" date,
-#     "SIZE_APP" text COLLATE pg_catalog."default",
+#     "package_name" text COLLATE pg_catalog."default",
+#     "name_app" text COLLATE pg_catalog."default",
+#     "updated" date,
+#     "size_app" text COLLATE pg_catalog."default",
 #     "INSTALLS" integer,
-#     "VERSION_APP" text COLLATE pg_catalog."default",
-#     "ANDROID_MIN_VERSION" text COLLATE pg_catalog."default",
-#     "OFFERED_BY" text COLLATE pg_catalog."default",
-#     "RATINGS" double precision,
-#     "RATINGS_NUMBER" double precision,
-#     "CATEGORY" text COLLATE pg_catalog."default",
-#     "PRICE" double precision,
+#     "version_app" text COLLATE pg_catalog."default",
+#     "android_min_version" text COLLATE pg_catalog."default",
+#     "offered_by" text COLLATE pg_catalog."default",
+#     "ratings" double precision,
+#     "ratings_number" double precision,
+#     "category" text COLLATE pg_catalog."default",
+#     "price" double precision,
 #     CONSTRAINT test1_pkey PRIMARY KEY ("ID")
 # )
 
