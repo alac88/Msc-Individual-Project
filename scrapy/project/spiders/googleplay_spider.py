@@ -7,8 +7,7 @@ from project.items import GooglePlayItem
 
 HOST = "localhost"
 USER = "postgres"
-PASSWORD = "ww6hfKnD4j"
-# PASSWORD = "testdb"
+PASSWORD = "testdb"
 DATABASE = "imperial_db"
 PORT = "5432"
 
@@ -22,6 +21,9 @@ class GooglePlaySpider(CrawlSpider):
         # Rule(LinkExtractor(allow=('/store/apps/details?')), callback='parseUrl'),
         Rule(LinkExtractor(allow=('/store/apps/details?')), follow=True, callback='parseUrl'),
         )
+
+    def parseName(self, name):
+        return name.translate({ord(i): None for i in '$.?,;:/!@=+$#&'}).lower().replace(" ", "-")
 
 
     def parseUrl(self, response):
@@ -55,8 +57,7 @@ class GooglePlaySpider(CrawlSpider):
                 item["Price"] = ["0.0"]
 
             # item["Link"] = response.xpath('').extract()
-            # item["APK"] = response.xpath('').extract()
-
+            item["APK_URL"] = "https://apkpure.com/" + self.parseName(item["Name"][0]) + "/" + item["PackageName"] + "/download?from=details"
 
             if not isInDatabase:
                 # print("Add in DB")
@@ -78,12 +79,12 @@ class GooglePlaySpider(CrawlSpider):
         
         cur = conn.cursor()
 
-        sql_name = "SELECT \"ID\" from public.test1 WHERE \"PACKAGE_NAME\"='%s'" % (packageName)
+        sql_name = "SELECT \"ID\" from public.test3 WHERE \"PACKAGE_NAME\"='%s'" % (packageName)
         cur.execute(sql_name)
         id_name = cur.fetchone()
         
         if id_name:
-            sql_version = "SELECT \"ID\" from public.test1 WHERE \"PACKAGE_NAME\"='%s' AND \"VERSION_APP\"='%s'" % (packageName, version)
+            sql_version = "SELECT \"ID\" from public.test3 WHERE \"PACKAGE_NAME\"='%s' AND \"VERSION_APP\"='%s'" % (packageName, version)
             cur.execute(sql_version)
             id_version = cur.fetchone()
 
@@ -103,12 +104,28 @@ class GooglePlaySpider(CrawlSpider):
 
     def addInDatabase(self, item):
 
+        # print(item)
+
+        # print(item["PackageName"])
+        # print(item["Name"][0])
+        # print(item["Updated"][0])
+        # print(item["Size"][0])
+        # print(int(item["Installs"][0].replace(",","").replace("+","")))
+        # print(item["Version"][0])
+        # print(item["AndroidMinVersion"][0])
+        # print(item["OfferedBy"][0])
+        # print(float(item["Ratings"][0].replace(",", ".")))
+        # print(float(item["RatingsNumber"][0].replace(",", ".")))
+        # print(item["Category"][0])
+        # print(float(item["Price"][0].replace(" Buy", "").replace("€", "")))
+        # print(item["APK_URL"])
+
         conn = psycopg2.connect("host=%s dbname=%s user=%s password=%s port=%s" % (HOST, DATABASE, USER, PASSWORD, PORT))
         # print("Database opened successfully")
         
         cur = conn.cursor()
 
-        sql = "INSERT INTO public.test1(\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\") VALUES ('%s','%s', '%s', '%s', '%d', '%s', '%s', '%s', %f, %f, '%s', %f)" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], int(item["Installs"][0].replace(",","").replace("+","")), item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), float(item["RatingsNumber"][0].replace(",", ".")), item["Category"][0], float(item["Price"][0].replace(" Buy", "").replace("€", "")))
+        sql = "INSERT INTO public.test3(\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") VALUES ('%s','%s', '%s', '%s', '%d', '%s', '%s', '%s', %f, %f, '%s', %f, '%s')" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], int(item["Installs"][0].replace(",","").replace("+","")), item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), float(item["RatingsNumber"][0].replace(",", ".")), item["Category"][0], float(item["Price"][0].replace(" Buy", "").replace("€", "")), item["APK_URL"])
         cur.execute(sql)
         
         conn.commit()
@@ -124,11 +141,11 @@ class GooglePlaySpider(CrawlSpider):
         
         cur = conn.cursor()
 
-        sql = "UPDATE public.test1 SET (\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\") = ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, %f, '%s', %f)" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), float(item["RatingsNumber"][0].replace(",", ".")), item["Category"][0], float(item["Price"][0].replace(",", ".")))
+        sql = "UPDATE public.test3 SET (\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") = ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, %f, '%s', %f, '%s')" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), float(item["RatingsNumber"][0].replace(",", ".")), item["Category"][0], float(item["Price"][0].replace(",", ".")), item["APK_URL"])
         cur.execute(sql)
         
         conn.commit()
-        # print("Record updated successfully")
+        # print("Record UPDATED successfully")
         conn.close()
 
         return True
