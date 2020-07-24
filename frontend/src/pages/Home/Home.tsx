@@ -139,16 +139,16 @@ function Home(props: any) {
                     <Block type="statistics"  url="/statistics"></Block>
                     <Block type="git"  url="https://github.com/alac88/Msc-Individual-Project"></Block>
                 </div>
-                {/* {appSelected && <AppModal
+                {appSelected && <AppModal
                     app={appSelected}
                     show={modalShow}
                     onHide={() => closeModal()}
-                    />} */}
-                {appsChecked && modalShow && <ComparisonModal
+                    />}
+                {/* {appsChecked && modalShow && <ComparisonModal
                     appsChecked={appsChecked}
                     show={modalShow}
                     onHide={() => closeModal()}
-                    />}
+                    />} */}
                 <div className="appContainer">
                     <div className="topBar">
                         <div className="appNumber">{appsList.length} apps found</div>

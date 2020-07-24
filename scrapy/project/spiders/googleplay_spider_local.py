@@ -149,3 +149,49 @@ class GooglePlaySpider(CrawlSpider):
         conn.close()
 
         return True
+
+
+# # -- Table: public.test1
+
+# # -- DROP TABLE public.test1;
+
+# # CREATE TABLE public.test1
+# # (
+# #     "ID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+# #     "package_name" text COLLATE pg_catalog."default",
+# #     "name_app" text COLLATE pg_catalog."default",
+# #     "updated" date,
+# #     "size_app" text COLLATE pg_catalog."default",
+# #     "INSTALLS" integer,
+# #     "version_app" text COLLATE pg_catalog."default",
+# #     "android_min_version" text COLLATE pg_catalog."default",
+# #     "offered_by" text COLLATE pg_catalog."default",
+# #     "ratings" double precision,
+# #     "ratings_number" double precision,
+# #     "category" text COLLATE pg_catalog."default",
+# #     "price" double precision,
+# #     CONSTRAINT test1_pkey PRIMARY KEY ("ID")
+# # )
+
+# # TABLESPACE pg_default;
+
+# # ALTER TABLE public.test1
+# #     OWNER to postgres;
+
+# CREATE TABLE IF NOT EXISTS "project" (
+# 	"id" serial,
+# 	"package_name" text,
+# 	"name_app" text,
+# 	"updated" date,
+# 	"size_app" text,
+# 	"installs" numeric(9,2),
+# 	"version_app" text,
+# 	"android_min_version" text,
+# 	"offered_by" text,
+# 	"ratings" numeric(9,2),
+# 	"ratings_number" numeric(9,2),
+# 	"category" text,
+# 	"price" numeric(9,2),
+# 	"apk_url" text,
+# 	PRIMARY KEY( id )
+# );
