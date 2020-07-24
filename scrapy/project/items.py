@@ -27,4 +27,4 @@ class GooglePlayItem(scrapy.Item):
     Description = scrapy.Field()
     Price = scrapy.Field()
     Link = scrapy.Field()
-    APK = scrapy.Field()
+    APK_URL = scrapy.Field()
