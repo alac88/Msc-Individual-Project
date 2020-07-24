@@ -1,0 +1,33 @@
+.infoContainer{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.appContainer{
+    padding: 15px;
+
+    .topBar{
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        .appNumber{
+            flex:1;
+        }
+
+        .button{
+            text-align: end;
+        }
+    }
+
+    .bottomBar{
+        .row{
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+
+        }
+    }
+}

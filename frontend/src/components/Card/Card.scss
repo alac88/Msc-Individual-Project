@@ -1,0 +1,44 @@
+.card{
+
+    width: fill-available;
+    &:hover{
+        border: 2px solid black;
+    }
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    margin: 10px;
+    background-color: #FFFFFF;
+    border: 1px solid #B0B0B0;
+    border-radius: 12px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+    color: #222222;
+
+}
+
+.mainRow{
+    display: flex;
+    flex-direction: row;
+
+    
+}
+
+.id{
+    flex: 1 !important;
+    font-weight: bold;
+}
+
+.id, .info{
+    flex: 5;
+    overflow: hidden;
+    align-self: center;
+    padding-left: 5px;
+    padding-right: 10px;
+}
+
+.download{
+    height: 50px;
+    width: 50px;
+    background-image: url('../../img/download.png');
+}
