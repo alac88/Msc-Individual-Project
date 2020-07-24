@@ -110,7 +110,7 @@ class GooglePlaySpider(CrawlSpider):
 
         cur = conn.cursor()
 
-        sql = "INSERT INTO project(\"package_name\",\"name_app\", \"updated\", \"size_app\", \"installs\", \"version_app\", \"android_min_version\", \"offered_by\", \"ratings\",$
+        sql = "INSERT INTO project(\"package_name\",\"name_app\", \"updated\", \"size_app\", \"installs\", \"version_app\", \"android_min_version\", \"offered_by\", \"ratings\", \"ratings_number\", \"category\", \"price\", \"apk_url\") VALUES ('%s','%s', '%s', '%s', '%d', '%s', '%s', '%s', %f, %f, '%s', %f, '%s')" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], int(item["Installs"][0].replace(",","").replace("+","")), item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), float(item["RatingsNumber"][0].replace(",", ".")), item["Category"][0], float(item["Price"][0].replace(" Buy", "").replace("€", "")), item["APK_URL"])
         cur.execute(sql)
 
         conn.commit()
@@ -126,7 +126,7 @@ class GooglePlaySpider(CrawlSpider):
 
         cur = conn.cursor()
 
-        sql = "UPDATE project SET (\"package_name\",\"name_app\", \"updated\", \"size_app\", \"INSTALLS\", \"version_app\", \"android_min_version\", \"offered_by\", \"ratings\",$
+        sql = "UPDATE project SET (\"package_name\",\"name_app\", \"updated\", \"size_app\", \"installs\", \"version_app\", \"android_min_version\", \"offered_by\", \"ratings\", \"ratings_number\", \"category\", \"price\", \"apk_url\") = ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, %f, '%s', %f, '%s')" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), float(item["RatingsNumber"][0].replace(",", ".")), item["Category"][0], float(item["Price"][0].replace(",", ".")), item["APK_URL"])
         cur.execute(sql)
 
         conn.commit()
