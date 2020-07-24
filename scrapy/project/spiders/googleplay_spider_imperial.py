@@ -63,7 +63,7 @@ class GooglePlaySpider(CrawlSpider):
             if not isInDatabase:
                 # print("Add in DB")
                 self.addInDatabase(item)
-                elif isInDatabase and not isLatestVersion:
+            elif isInDatabase and not isLatestVersion:
                 # print("Update in DB")
                 self.updateInDatabase(item)
             # else:
