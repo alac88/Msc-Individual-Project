@@ -1,0 +1,38 @@
+.blockContainer{
+    height: 300px;
+    width: 300px;
+    max-height: 33.3333%;
+    max-width: 33.3333%;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 8px !important;
+    border-radius: 16px !important;
+    
+    a {
+        text-decoration: none;
+        color: rgb(34, 34, 34);
+    }
+
+}
+
+.topSection {
+    border-radius: 16px 16px 0 0;
+    height: 70%;
+    overflow: hidden;
+
+    // To remove
+    background-color: black;
+}
+
+.imgContainer {
+    max-height:100%;
+    max-width: auto;
+}
+
+.bottomSection{
+    border-radius: 0 0 16px 16px;
+    height: 30%;
+    padding: 5px 20px;
+    font-size: 16px;;
+    font-weight: 600;
+    line-height: 22px;
+
+} 

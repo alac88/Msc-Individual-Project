@@ -1,0 +1,47 @@
+.counterContainer{
+    flex:1;
+    height: 100%;
+    padding: 0 15px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    
+    .appsNumber{
+        display: flex;
+        flex-direction: row;
+
+        .counterButton{
+            cursor: pointer;
+            // border:none;
+            height: 20px;
+            width: 20px;
+            text-align: center;
+            border-radius: 50%;
+            background-color: white;
+            border: solid 1px rgb(176, 176, 176);
+            font-size: 100%;
+
+            &:hover{
+                border-color: black;
+            }
+
+            &:focus{
+                outline: none;
+            }
+
+            span{
+                height: 30px;
+                width: 30px;
+            }
+        }
+
+        .counter{
+            cursor: pointer;
+            padding: 0 10px;
+            border:none;
+            outline:none;
+            text-align: center;
+        }
+    }
+}
