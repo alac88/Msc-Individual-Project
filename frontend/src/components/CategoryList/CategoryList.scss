@@ -1,0 +1,17 @@
+.categoryListContainer {
+    height: fill-available;
+    width: fill-available;
+    outline: none;
+
+    h5{
+        margin: 0;
+        padding: 0 10px;
+    }
+
+    #category{
+        padding: 10px 10px 0 10px;
+        width: fill-available;
+        border:none;
+        outline: none;
+    }
+}
