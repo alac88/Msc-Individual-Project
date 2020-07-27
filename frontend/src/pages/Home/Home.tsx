@@ -10,6 +10,8 @@ import AppModal from '../../modals/AppModal';
 import ComparisonModal from '../../modals/ComparisonModal';
 import './Home.scss';
 
+const databaseUrl = "localhost";
+
 interface AppProps{
     ID: number, 
     NAME_APP: string, 
@@ -44,7 +46,7 @@ function Home(props: any) {
     }, []);
 
     function getApps() {
-        fetch(`http://localhost:3001?name=${query.get('name') || ''}&category=${encodeURIComponent(query.get('category') || '')}&Max=${query.get('Max') || '0'}`)
+        fetch(`http://${databaseUrl}:3001?name=${query.get('name') || ''}&category=${encodeURIComponent(query.get('category') || '')}&Max=${query.get('Max') || '0'}`)
             .then(response => {
                 return response.json();
             })
@@ -56,7 +58,7 @@ function Home(props: any) {
 
     function getAppInfo(name: string) {
         // fetch(`http://localhost:3001/app?packageName=${props.packageName}`)
-        fetch(`http://localhost:3001/app?packageName=${name}`)
+        fetch(`http://${databaseUrl}:3001/app?packageName=${name}`)
         .then(response => {
             return response.json();
         })
@@ -153,7 +155,7 @@ function Home(props: any) {
                     <div className="topBar">
                         <div className="appNumber">{appsList.length} apps found</div>
                         <div className="button">
-                            <input type="submit" name="compare" value="Compare" className="danger" disabled={ appsChecked.length > 0 ? false : true }/>
+                            <input type="submit" name="compare" defaultValue="Compare" className="danger" disabled={ appsChecked.length > 0 ? false : true }/>
                         </div>
                     </div>
                     {renderApps()}

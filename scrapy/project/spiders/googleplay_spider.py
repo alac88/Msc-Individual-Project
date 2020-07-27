@@ -1,14 +1,21 @@
 import scrapy
 import psycopg2
+import urllib.parse as urlparse
+from urllib.parse import parse_qs
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 from project.items import GooglePlayItem
 
+# HOST = "localhost"
+# USER = "postgres"
+# PASSWORD = "testdb"
+# DATABASE = "imperial_db"
+# PORT = "5432"
 
-HOST = "db.doc.ic.ac.uk"
-USER = "al3919"
-PASSWORD = "MfApFfQs5P"
-DATABASE = "al3919"
+HOST = "localhost"
+USER = "postgres"
+PASSWORD = "testdb"
+DATABASE = "imperial"
 PORT = "5432"
 
 class GooglePlaySpider(CrawlSpider):
@@ -30,8 +37,9 @@ class GooglePlaySpider(CrawlSpider):
     # def parse(self, response):
 
         item = GooglePlayItem()
+        parsed = urlparse.urlparse(response.request.url)
 
-        item["PackageName"] = response.xpath('//button[contains(@aria-label, "Install") or contains(@aria-label, "Buy")]/@data-item-id').extract()[0].split('"')[1]
+        item["PackageName"] = parse_qs(parsed.query)['id'][0]
         item["Version"] = response.xpath('//*[div/text()[contains(., "Current Version" )]]/span/div/span/text()').extract()
 
         if item["PackageName"] and item["Version"]:
@@ -80,12 +88,12 @@ class GooglePlaySpider(CrawlSpider):
 
         cur = conn.cursor()
 
-        sql_name = "SELECT \"id\" from project WHERE \"package_name\"='%s'" % (packageName)
+        sql_name = "SELECT \"ID\" from project WHERE \"PACKAGE_NAME\"='%s'" % (packageName)
         cur.execute(sql_name)
         id_name = cur.fetchone()
 
         if id_name:
-            sql_version = "SELECT \"id\" from project WHERE \"package_name\"='%s' AND \"version_app\"='%s'" % (packageName, version)
+            sql_version = "SELECT \"ID\" from project WHERE \"PACKAGE_NAME\"='%s' AND \"VERSION_APP\"='%s'" % (packageName, version)
             cur.execute(sql_version)
             id_version = cur.fetchone()
 
@@ -110,7 +118,7 @@ class GooglePlaySpider(CrawlSpider):
 
         cur = conn.cursor()
 
-        sql = "INSERT INTO project(\"package_name\",\"name_app\", \"updated\", \"size_app\", \"installs\", \"version_app\", \"android_min_version\", \"offered_by\", \"ratings\", \"ratings_number\", \"category\", \"price\", \"apk_url\") VALUES ('%s','%s', '%s', '%s', '%d', '%s', '%s', '%s', %f, %f, '%s', %f, '%s')" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], int(item["Installs"][0].replace(",","").replace("+","")), item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), float(item["RatingsNumber"][0].replace(",", ".")), item["Category"][0], float(item["Price"][0].replace(" Buy", "").replace("€", "")), item["APK_URL"])
+        sql = "INSERT INTO project(\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") VALUES ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s')" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", " ")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(" Buy", "").replace("€", "")), item["APK_URL"])
         cur.execute(sql)
 
         conn.commit()
@@ -126,7 +134,7 @@ class GooglePlaySpider(CrawlSpider):
 
         cur = conn.cursor()
 
-        sql = "UPDATE project SET (\"package_name\",\"name_app\", \"updated\", \"size_app\", \"installs\", \"version_app\", \"android_min_version\", \"offered_by\", \"ratings\", \"ratings_number\", \"category\", \"price\", \"apk_url\") = ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, %f, '%s', %f, '%s')" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), float(item["RatingsNumber"][0].replace(",", ".")), item["Category"][0], float(item["Price"][0].replace(",", ".")), item["APK_URL"])
+        sql = "UPDATE project SET (\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") = ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s')" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(",", ".")), item["APK_URL"])
         cur.execute(sql)
 
         conn.commit()
@@ -134,3 +142,50 @@ class GooglePlaySpider(CrawlSpider):
         conn.close()
 
         return True
+
+
+
+# # # -- Table: public.test1
+
+# # # -- DROP TABLE public.test1;
+
+# # # CREATE TABLE public.test1
+# # # (
+# # #     "ID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
+# # #     "PACKAGE_NAME" text COLLATE pg_catalog."default",
+# # #     "NAME_APP" text COLLATE pg_catalog."default",
+# # #     "UPDATED" date,
+# # #     "PACKAGE_NAME" text COLLATE pg_catalog."default",
+# # #     "INSTALLS" integer,
+# # #     "VERSION_APP" text COLLATE pg_catalog."default",
+# # #     "ANDROID_MIN_VERSION" text COLLATE pg_catalog."default",
+# # #     "OFFERED_BY" text COLLATE pg_catalog."default",
+# # #     "RATINGS" double precision,
+# # #     "RATINGS_NUMBER" double precision,
+# # #     "CATEGORY" text COLLATE pg_catalog."default",
+# # #     "PRICE" double precision,
+# # #     CONSTRAINT test1_pkey PRIMARY KEY ("ID")
+# # # )
+
+# # # TABLESPACE pg_default;
+
+# # # ALTER TABLE public.test1
+# # #     OWNER to postgres;
+
+# CREATE TABLE IF NOT EXISTS "project" (
+# 	"ID" serial,
+# 	"PACKAGE_NAME" text,
+# 	"NAME_APP" text,
+# 	"UPDATED" date,
+# 	"SIZE_APP" text,
+# 	"INSTALLS" text,
+# 	"VERSION_APP" text,
+# 	"ANDROID_MIN_VERSION" text,
+# 	"OFFERED_BY" text,
+# 	"RATINGS" numeric(9,2),
+# 	"RATINGS_NUMBER" text,
+# 	"CATEGORY" text,
+# 	"PRICE" numeric(9,2),
+# 	"APK_URL" text,
+# 	PRIMARY KEY( ID )
+# );

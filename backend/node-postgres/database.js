@@ -1,4 +1,12 @@
 const Pool = require('pg').Pool
+// const pool = new Pool({
+//   user: 'postgres',
+//   host: 'localhost',
+//   database: 'imperial',
+//   password: 'testdb',
+//   port: 5432,
+// });
+
 const pool = new Pool({
   user: 'postgres',
   host: 'localhost',
@@ -6,6 +14,11 @@ const pool = new Pool({
   password: 'testdb',
   port: 5432,
 });
+
+function isNormalInteger(str) {
+  var n = Math.floor(Number(str));
+  return n !== Infinity && String(n) === str && n > 0;
+}
 
 function getAllApps(){
   return new Promise(function(resolve, reject) {
@@ -19,8 +32,8 @@ function getAllApps(){
   }) 
 }
 
-function getAppsByName(name, max = 0){
-  if (max){
+function getAppsByName(name, max){
+  if (max && isNormalInteger(max)){
     return new Promise(function(resolve, reject) {
       pool.query(`SELECT * FROM public.test3 WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
         if (error) {
@@ -43,8 +56,8 @@ function getAppsByName(name, max = 0){
   }
 }
 
-function getAppsByCategory(category, max = 0){
-  if (max){
+function getAppsByCategory(category, max){
+  if (max && isNormalInteger(max)){
     return new Promise(function(resolve, reject) {
       pool.query(`SELECT * FROM public.test3 WHERE "CATEGORY"='${category}' ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
         if (error) {
@@ -79,8 +92,8 @@ function getSomeApps(max){
   }) 
 }
 
-function getAppsByNameAndCategory(name, category, max = 0){
-  if (max){
+function getAppsByNameAndCategory(name, category, max){
+  if (max && isNormalInteger(max)){
     return new Promise(function(resolve, reject) {
       pool.query(`SELECT * FROM public.test3 WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') AND "CATEGORY"='${category}' ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
         if (error) {
@@ -105,25 +118,12 @@ function getAppsByNameAndCategory(name, category, max = 0){
 const getApps = (name, category, max) => {
 
   if ((name != null) && (category != null) && (name != '') && (category != '')) {
-    if (max != '') {
-      return getAppsByNameAndCategory(name, category, max);
-    } else {
-      return getAppsByNameAndCategory(name, category);
-    }
+    return getAppsByNameAndCategory(name, category, max);
   } else if ((name != null) && (name != '')) {
-    if (max != '') {
-      return getAppsByName(name, max);
-    } else {
-      return getAppsByName(name);
-    }
+    return getAppsByName(name, max);
   } else if ((category != null) && (category != '')) {
-    if (max != '') {
-      return getAppsByCategory(category, max);
-    } else {
-      return getAppsByCategory(category);
-    }
-  } else if ((max != null) && (max != '') && (max != '0')) {
-    console.log("hello");
+    return getAppsByCategory(category, max);
+  } else if (max && isNormalInteger(max)) {
     return getSomeApps(max);
   } else {
     return getAllApps();

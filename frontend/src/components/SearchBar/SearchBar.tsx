@@ -27,7 +27,7 @@ function SearchBar(){
                 </div>
                 <div className="button danger">
                     {/* <button><FormattedMessage id="home.search" /></button> */}
-                        <input type="submit" name="validate" value="Search" className="danger"/>
+                        <input type="submit" name="validate" defaultValue="Search" className="danger"/>
                 </div>
             </div>
 

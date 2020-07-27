@@ -14,6 +14,8 @@ interface AppProps{
     RATINGS: number
 }
 
+const databaseUrl ="localhost";
+
 function Statistics(props: any) {
 
     const [appsList, setApps] = useState(Array<AppProps>());
@@ -23,7 +25,7 @@ function Statistics(props: any) {
     }, []);
 
     function getApps() {
-        fetch('http://localhost:3001')
+        fetch(`http://${databaseUrl}:3001`)
             .then(response => {
                 return response.json();
             })
