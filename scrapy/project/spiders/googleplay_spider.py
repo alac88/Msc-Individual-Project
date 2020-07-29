@@ -187,5 +187,6 @@ class GooglePlaySpider(CrawlSpider):
 # 	"CATEGORY" text,
 # 	"PRICE" numeric(9,2),
 # 	"APK_URL" text,
-# 	PRIMARY KEY( ID )
+# 	"VIRUS_TOTAL" jsonb,
+# 	PRIMARY KEY( "ID" )
 # );
