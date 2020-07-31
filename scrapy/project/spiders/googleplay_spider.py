@@ -1,4 +1,5 @@
 import scrapy
+import subprocess
 import psycopg2
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
@@ -71,9 +72,11 @@ class GooglePlaySpider(CrawlSpider):
             if not isInDatabase:
                 # print("Add in DB")
                 self.addInDatabase(item)
+                # self.analyseApp(item["PackageName"], item["APK_URL"])
             elif isInDatabase and not isLatestVersion:
                 # print("Update in DB")
                 self.updateInDatabase(item)
+                # self.analyseApp(item["PackageName"], item["APK_URL"])
             # else:
                 # print("Nothing to do")
 
@@ -129,7 +132,7 @@ class GooglePlaySpider(CrawlSpider):
 
     def updateInDatabase(self, item):
 
-        conn = psycopg2.connect("host=%s database=%s user=%s password=%s port=%s" % (HOST, DATABASE, USER, PASSWORD, PORT))
+        conn = psycopg2.connect("host=%s dbname=%s user=%s password=%s port=%s" % (HOST, DATABASE, USER, PASSWORD, PORT))
         # print("Database opened successfully")
 
         cur = conn.cursor()
@@ -142,6 +145,9 @@ class GooglePlaySpider(CrawlSpider):
         conn.close()
 
         return True
+
+    def analyseApp(self, packageName, url):
+        subprocess.run(["python3", "download_apk.py", packageName, url], check=True)
 
 
 
@@ -172,7 +178,7 @@ class GooglePlaySpider(CrawlSpider):
 # # # ALTER TABLE public.test1
 # # #     OWNER to postgres;
 
-# CREATE TABLE IF NOT EXISTS "project" (
+# CREATE TABLE IF NOT EXISTS "projectDB" (
 # 	"ID" serial,
 # 	"PACKAGE_NAME" text,
 # 	"NAME_APP" text,
