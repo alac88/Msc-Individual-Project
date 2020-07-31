@@ -25,19 +25,18 @@ interface AppProps{
     INSTALLS: number,
     UPDATED: Date,
     SIZE_APP: string,
-    TEST1: number,
-    TEST2: number,
-    TEST3: number,
-    SECURITY_SCORE: number
+    VIRUS_TOTAL: JSON
 }
 
 function Home(props: any) {
 
     const [appsList, setApps] = useState(Array<AppProps>());
     const [modalShow, setModalShow] = useState(false);
-    const [appsChecked, setAppsChecked] = useState(Array<AppProps>());
-
+    
     const [appSelected, setAppSelected] = useState<AppProps>();
+    
+    const [state, setState] = useState(false);
+    const [showComparisonModal, setShowComparisonModal] = useState(false);
 
     const query = new URLSearchParams(props.location.search);
     
@@ -67,65 +66,92 @@ function Home(props: any) {
         });
     }
 
-    function checkApp(app: AppProps){
-
-        const index = appsChecked.indexOf(app);
-
-        if (index > -1 ){
-            appsChecked.splice(index, 1);
-            console.log(appsChecked);
-            return;
-        }
-
-        setAppsChecked([...appsChecked, app ]);
-        
-        console.log(appsChecked);
-    }
-
-    function checkAll(){
-        if (appsChecked.length == appsList.length){
-            setAppsChecked([]);
-        } else {
-            setAppsChecked([]);
-            appsList.map((app) => {
-                console.log(app.PACKAGE_NAME);
-                setAppsChecked([...appsChecked, app]);
-            })
-        }
-
-    }
-
-    function isChecked(name: string){
-        appsChecked.map((app) => {
-            if (name == app.NAME_APP){
-                return true;
-            }
-        })
-        return false;
-    }
-
     function openModal(name: string){
         getAppInfo(name);
         document.getElementById("overlay")?.classList.add('active');
         setModalShow(true);
-
     }
 
-    function closeModal(){
-        setModalShow(false);
+    function openComparisonModal(){
+        document.getElementById("overlay")?.classList.add('active');
+        setShowComparisonModal(true);
+    }
+
+    function closeModal(isComparisonModal=false){
+        if (!isComparisonModal){
+            setModalShow(false);
+            setAppSelected(undefined);
+        } else {
+            setShowComparisonModal(false);
+        }
         document.getElementById("overlay")?.classList.remove('active');
-        setAppSelected(undefined);
+    }
+
+
+    function checkAll(){
+        var checkboxes = document.getElementsByName('checkbox');
+        var test = getCheckedApps().length == appsList.length;
+        // setIsAllChecked(test);
+        
+        for (var i = 0 ; i < checkboxes.length ; i++){
+            if (test){
+                checkboxes[i].removeAttribute('checked');
+            } else {
+                checkboxes[i].setAttribute('checked', 'checked');
+            }
+        }
+
+        setState(true);
+        console.log(getCheckedApps().length);
+        
+    }
+
+    function checkApp(packageName: string){
+        var checkbox = document.getElementById(packageName);
+        if (checkbox?.hasAttribute("checked") && (checkbox.getAttribute("checked") == "checked") ){
+            checkbox?.removeAttribute("checked");
+            // setIsAllChecked(false);
+        } else {
+            checkbox?.setAttribute("checked", "checked");
+            // getCheckedApps();
+            // setIsAllChecked(checkedApps.length == appsList.length);
+        }
+        setState(true);
+    }
+
+    function getCheckedApps() {
+        var checkboxes = document.getElementsByName('checkbox');
+        var checkedApps = Array<AppProps>();
+        for (var i = 0 ; i < checkboxes.length ; i++){
+            if (checkboxes[i].hasAttribute("checked") && (checkboxes[i].getAttribute("checked") == "checked") ){
+                var app = appsList.find((el) => el.PACKAGE_NAME == checkboxes[i].id);
+                if (app){
+                    checkedApps.push(app);
+                }
+            }
+        }
+
+        return checkedApps;
     }
 
     function renderApps(){
         return (
             <div className="bottomBar">
                 <div className="row">
-                        <input id="all" type="checkbox" onClick={() => checkAll()}/>
+                        <input id="all" type="checkbox" onChange={() => checkAll()}/>
+                        <div className="headings">
+                            <span className="id">ID</span>
+                            <span>App Name</span>
+                            <span>Package Name</span>
+                            <span>Version</span>
+                            <span>Category</span>
+                            <span>Price</span>
+                            <span>Ratings</span>
+                        </div>
                 </div>
                 {appsList.map((app) => (
                     <div className="row">
-                        <input id={app.NAME_APP} type="checkbox" onClick={() => checkApp(app)} defaultChecked={isChecked(app.PACKAGE_NAME)}/>
+                        <input key={"checkbox"+app.ID} id={app.PACKAGE_NAME} onChange={() => checkApp(app.PACKAGE_NAME)} name="checkbox" type="checkbox" />
                         <Card select={() => openModal(app.PACKAGE_NAME)} key={app.ID} id={app.ID} name={app.NAME_APP} packageName={app.PACKAGE_NAME} version={app.VERSION_APP} category={app.CATEGORY} price={app.PRICE} ratings={app.RATINGS} ></Card>
                     </div>
                 ))}
@@ -146,16 +172,17 @@ function Home(props: any) {
                     show={modalShow}
                     onHide={() => closeModal()}
                     />}
-                {/* {appsChecked && modalShow && <ComparisonModal
-                    appsChecked={appsChecked}
-                    show={modalShow}
-                    onHide={() => closeModal()}
-                    />} */}
+                {showComparisonModal && <ComparisonModal
+                    appsChecked={getCheckedApps()}
+                    show={showComparisonModal}
+                    onHide={() => closeModal(true)}
+                    />}
                 <div className="appContainer">
                     <div className="topBar">
                         <div className="appNumber">{appsList.length} apps found</div>
                         <div className="button">
-                            <input type="submit" name="compare" defaultValue="Compare" className="danger" disabled={ appsChecked.length > 0 ? false : true }/>
+                            {/* <input type="submit" name="compare" value="Compare" className="danger" disabled={ getCheckedApps().length >= 2 ? false : true }/> */}
+                            <input type="submit" name="compare" value="Compare" className="danger" onClick={() => openComparisonModal()}/>
                         </div>
                     </div>
                     {renderApps()}

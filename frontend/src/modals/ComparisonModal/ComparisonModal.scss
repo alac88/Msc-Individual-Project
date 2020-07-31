@@ -52,6 +52,10 @@
 
             tbody th{
                 font-weight: 400;
+
+                &.securityScore{
+                    font-weight: bold;
+                }
             }
         }
     

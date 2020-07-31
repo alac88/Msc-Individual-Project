@@ -28,6 +28,25 @@
             flex-direction: row;
             align-items: center;
 
+            .headings{
+                width: fill-available;
+                cursor: pointer;
+                display: flex;
+                flex-direction: row;
+                padding: 10px;
+                margin: 10px;
+                color: #222222;
+
+                span{
+                    flex: 5;
+                    overflow: hidden;
+                    align-self: center;
+                    padding-left: 5px;
+                    padding-right: 10px;
+                }
+
+            }
+
         }
     }
 }

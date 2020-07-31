@@ -5,16 +5,29 @@ import React, {
 import Modal from "react-bootstrap/Modal";
 import "./AppModal.scss";
 
-function AppModal(props: any) {
 
+function AppModal(props: any) {
+  
   const setOverlay = () => {
     document.getElementById("modal")?.classList.add('active');
-
+    
   };
-
+  
   const onExit = () => {
     document.getElementById("modal")?.classList.remove('modal');
   };
+  
+  function getSecurityScore(){
+    var securityScore = 0;
+    var count = 0;
+    Object.keys(props.app[0].VIRUS_TOTAL.stats).map((cat) => {
+      count += props.app[0].VIRUS_TOTAL.stats[cat];
+      if ((cat == "malicious") || (cat == "suspicious") ){
+        securityScore += props.app[0].VIRUS_TOTAL.stats[cat];
+      }
+    })
+    return securityScore / count;
+  }
 
   return (
     <div id="modal">
@@ -45,30 +58,31 @@ function AppModal(props: any) {
             <div className="row"><b>Offered By: </b>{props.app[0].OFFERED_BY}</div>
           </>
 
-          <div className="analysis">
-            <h2>Analysis</h2>
-            <table>
-                <thead>
-                  <tr>
-                      <th scope="col">App Name</th>
-                      <th scope="col">Mobile Squatting</th>
-                      <th scope="col">Permission Requests</th>
-                      <th scope="col">Test 3</th>
-                      <th scope="col">Security Score</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                      <th>{props.app[0].NAME_APP}</th>
-                      {/* <th>{props.app[0].TEST1 ? <Green/> : <Red />}</th> */}
-                      <th>{props.app[0].TEST1}</th>
-                      <th>{props.app[0].TEST2}</th>
-                      <th>{props.app[0].TEST3}</th>
-                      <th>{props.app[0].SECURITY_SCORE}</th>
-                  </tr>
-                </tbody>
-                </table>
-          </div>
+          { props.app[0].VIRUS_TOTAL && 
+            <div className="analysis">
+              <h2>Analysis</h2>
+              <table>
+                  <thead>
+                    <tr>
+                        <th scope="col">App Name</th>
+                        {Object.keys(props.app[0].VIRUS_TOTAL.results).map((key) => {
+                          return <th>{key}</th>;
+                        })}
+                        <th scope="col">Security Score</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                        <th>{props.app[0].NAME_APP}</th>
+                        {Object.keys(props.app[0].VIRUS_TOTAL.results).map((key) => {
+                          return <th>{props.app[0].VIRUS_TOTAL.results[key].category}</th>;
+                        })}
+                        <th>{getSecurityScore()}</th>
+                    </tr>
+                  </tbody>
+                  </table>
+            </div>
+          } 
 
         </Modal.Body>
         <Modal.Footer>

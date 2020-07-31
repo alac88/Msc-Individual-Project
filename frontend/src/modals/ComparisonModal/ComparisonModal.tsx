@@ -30,6 +30,18 @@ function ComparisonModal(props: any) {
         document.getElementById("modal")?.classList.remove("modal");
     };
 
+    function getSecurityScore(app: any){
+        var securityScore = 0;
+        var count = 0;
+        Object.keys(app.VIRUS_TOTAL.stats).map((cat) => {
+            count += app.VIRUS_TOTAL.stats[cat];
+            if ((cat == "malicious") || (cat == "suspicious") ){
+                securityScore += app.VIRUS_TOTAL.stats[cat];
+            }
+        })
+        return securityScore / count;
+    }
+
     return (
         <div id="modal">
         <Modal
@@ -46,22 +58,26 @@ function ComparisonModal(props: any) {
                 <thead>
                     <tr>
                         <th scope="col">App Name</th>
-                        <th scope="col">Mobile Squatting</th>
-                        <th scope="col">Permission Requests</th>
-                        <th scope="col">Test 3</th>
                         <th scope="col">Security Score</th>
+                        {Object.keys(props.appsChecked[0].VIRUS_TOTAL.results).map((key) => {
+                            return <th>{key}</th>;
+                        })}
                     </tr>
                     </thead>
                     <tbody>
                         {props.appsChecked.map((app: any) => {
-                            console.log(app);
+                            // console.log(app);
                             return (
                                 <tr>
                                     <th>{app.NAME_APP}</th>
-                                    <th>{app.TEST1}</th>
-                                    <th>{app.TEST2}</th>
-                                    <th>{app.TEST3}</th>
-                                    <th>{app.SECURITY_SCORE}</th>
+                                    {app.VIRUS_TOTAL ?
+                                        <>
+                                        <th className="securityScore">{getSecurityScore(app)}</th>
+                                        {Object.keys(app.VIRUS_TOTAL.results).map((key) => {
+                                            return <th>{app.VIRUS_TOTAL.results[key].category}</th>;
+                                        })}
+                                        </>
+                                    : <th>Analysis not available</th>}
                                 </tr>
                             );
                         })}
@@ -69,6 +85,9 @@ function ComparisonModal(props: any) {
                 </table>
             </Modal.Body>
             <Modal.Footer>
+            <div className="button">
+                <input type="submit" name="download" value="Download (.xls)" className="success" />
+            </div>
             <div className="button">
                 <input
                 type="submit"

@@ -19,7 +19,7 @@ function AnalysisList(props: Props){
             <input placeholder="What kind of analysis?" list="analysis" name="analysisList" id="analysisList"/>
                 <datalist id="analysis">
                     {analysisList.map((analysis) => {
-                        return <option value={analysis}/>
+                        return <option key={analysis} value={analysis}/>
                     })}
                 </datalist> 
         </div>

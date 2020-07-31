@@ -57,7 +57,6 @@ function CategoryList(props: Props){
         "Racing",
         "Role Playing",
         "Simulation",
-        "Sports",
         "Strategy",
         "Trivia",
         "Word",
@@ -68,7 +67,6 @@ function CategoryList(props: Props){
         "Action & Adventure",
         "Brain Games",
         "Creativity",
-        "Education",
         "Music & Video",
         "Pretend Play"]);
 
@@ -79,7 +77,7 @@ function CategoryList(props: Props){
             <input placeholder="Choose a category" list="categories" name="category" id="category"/>
                 <datalist id="categories">
                     {categoryList.map((category) => {
-                        return <option value={category}/>
+                        return <option key={category} value={category}/>
                     })}
                 </datalist> 
         </div>
