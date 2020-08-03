@@ -35,7 +35,9 @@ function Home(props: any) {
     
     const [appSelected, setAppSelected] = useState<AppProps>();
     
-    const [state, setState] = useState(false);
+    const [checkedApps, setCheckedApps] = useState(Array<AppProps>());
+
+    // const [state, setState] = useState(false);
     const [showComparisonModal, setShowComparisonModal] = useState(false);
 
     const query = new URLSearchParams(props.location.search);
@@ -90,48 +92,55 @@ function Home(props: any) {
 
     function checkAll(){
         var checkboxes = document.getElementsByName('checkbox');
-        var test = getCheckedApps().length == appsList.length;
-        // setIsAllChecked(test);
+        var allAppsChecked = checkedApps.length == appsList.length; // select all
         
         for (var i = 0 ; i < checkboxes.length ; i++){
-            if (test){
+            if (allAppsChecked){
                 checkboxes[i].removeAttribute('checked');
             } else {
                 checkboxes[i].setAttribute('checked', 'checked');
             }
         }
 
-        setState(true);
-        console.log(getCheckedApps().length);
+        if (allAppsChecked){
+            setCheckedApps([]);
+        } else {
+            setCheckedApps(appsList);
+        }
         
     }
 
     function checkApp(packageName: string){
         var checkbox = document.getElementById(packageName);
-        if (checkbox?.hasAttribute("checked") && (checkbox.getAttribute("checked") == "checked") ){
-            checkbox?.removeAttribute("checked");
-            // setIsAllChecked(false);
-        } else {
-            checkbox?.setAttribute("checked", "checked");
-            // getCheckedApps();
-            // setIsAllChecked(checkedApps.length == appsList.length);
-        }
-        setState(true);
-    }
-
-    function getCheckedApps() {
-        var checkboxes = document.getElementsByName('checkbox');
-        var checkedApps = Array<AppProps>();
-        for (var i = 0 ; i < checkboxes.length ; i++){
-            if (checkboxes[i].hasAttribute("checked") && (checkboxes[i].getAttribute("checked") == "checked") ){
-                var app = appsList.find((el) => el.PACKAGE_NAME == checkboxes[i].id);
-                if (app){
-                    checkedApps.push(app);
+        if (checkbox){
+            // If already checked
+            if (checkbox.hasAttribute("checked") && (checkbox.getAttribute("checked") == "checked") ){
+                checkbox.removeAttribute("checked");
+                var newCheckedApps = checkedApps.filter((el) => el.PACKAGE_NAME == checkbox?.id)
+                setCheckedApps(newCheckedApps);
+            } 
+            // If not checked yet
+            else {
+                checkbox.setAttribute("checked", "checked");
+                var app = getAppFullData(checkbox.id);
+                if (app) {
+                    setCheckedApps([...checkedApps, app]);
                 }
             }
+        
         }
+    }
 
-        return checkedApps;
+    function getAppFullData(packageName: string){
+        var app = appsList.find((el) => el.PACKAGE_NAME == packageName);
+        return app ? app : null;
+    }
+
+    function isChecked(app: AppProps){
+        if (checkedApps.find((el) => el.PACKAGE_NAME == app.PACKAGE_NAME)){
+            return true;
+        }
+        return false;
     }
 
     function renderApps(){
@@ -151,7 +160,7 @@ function Home(props: any) {
                 </div>
                 {appsList.map((app) => (
                     <div className="row">
-                        <input key={"checkbox"+app.ID} id={app.PACKAGE_NAME} onChange={() => checkApp(app.PACKAGE_NAME)} name="checkbox" type="checkbox" />
+                        <input key={"checkbox"+app.ID} id={app.PACKAGE_NAME} onChange={() => checkApp(app.PACKAGE_NAME)} name="checkbox" type="checkbox" checked={isChecked(app)}/>
                         <Card select={() => openModal(app.PACKAGE_NAME)} key={app.ID} id={app.ID} name={app.NAME_APP} packageName={app.PACKAGE_NAME} version={app.VERSION_APP} category={app.CATEGORY} price={app.PRICE} ratings={app.RATINGS} ></Card>
                     </div>
                 ))}
@@ -173,7 +182,7 @@ function Home(props: any) {
                     onHide={() => closeModal()}
                     />}
                 {showComparisonModal && <ComparisonModal
-                    appsChecked={getCheckedApps()}
+                    appsChecked={checkedApps}
                     show={showComparisonModal}
                     onHide={() => closeModal(true)}
                     />}
@@ -182,7 +191,7 @@ function Home(props: any) {
                         <div className="appNumber">{appsList.length} apps found</div>
                         <div className="button">
                             {/* <input type="submit" name="compare" value="Compare" className="danger" disabled={ getCheckedApps().length >= 2 ? false : true }/> */}
-                            <input type="submit" name="compare" value="Compare" className="danger" onClick={() => openComparisonModal()}/>
+                            <input type="submit" name="compare" value="Compare" className="danger" onClick={() => openComparisonModal() } disabled={ checkedApps.length >= 2 ? false : true }/>
                         </div>
                     </div>
                     {renderApps()}
