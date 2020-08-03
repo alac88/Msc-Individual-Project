@@ -13,7 +13,9 @@ API_KEY = 'a01255f309c75b3642163d9a522f1b761a8e7f9327b656031e2b874156336c04'
 
 
 def main():
+	print("Virus Total")
 	id = getFileID()
+	print(id)
 
 	if id:
 		analysis = getFileAnalysis(id)
@@ -33,8 +35,9 @@ def updateInDatabase(analysis):
 	conn = psycopg2.connect("host=%s dbname=%s user=%s password=%s port=%s" % (HOST, DATABASE, USER, PASSWORD, PORT))
 
 	cur = conn.cursor()
-
-	sql = "UPDATE public.test3 SET \"VIRUS_TOTAL\" = \'" + str(analysis).replace("\'", "\"" ).replace("None", "\"None\"") + "\' WHERE \"PACKAGE_NAME\" = '" + sys.argv[1] + "' "
+	print("update DB with virustotal")
+	sql = "UPDATE public.test4 SET \"VIRUS_TOTAL\" = \'" + str(analysis).replace("\'", "\"" ).replace("None", "\"None\"") + "\' WHERE \"PACKAGE_NAME\" = '" + sys.argv[1] + "' "
+	print(sql)
 	cur.execute(sql)
 
 	conn.commit()
