@@ -1,5 +1,5 @@
 import scrapy
-import subprocess
+import asyncio
 import psycopg2
 import urllib.parse as urlparse
 from urllib.parse import parse_qs
@@ -16,7 +16,7 @@ from project.items import GooglePlayItem
 HOST = "localhost"
 USER = "postgres"
 PASSWORD = "testdb"
-DATABASE = "imperial"
+DATABASE = "imperial_db"
 PORT = "5432"
 
 class GooglePlaySpider(CrawlSpider):
@@ -26,12 +26,12 @@ class GooglePlaySpider(CrawlSpider):
     start_urls = ['https://play.google.com/store/apps/details?id=com.weward&hl=en']
     rules = (
         # Rule(LinkExtractor(allow=('/store/apps',))),
-        # Rule(LinkExtractor(allow=('/store/apps/details?')), callback='parseUrl'),
-        Rule(LinkExtractor(allow=('/store/apps/details?')), follow=True, callback='parseUrl'),
+        Rule(LinkExtractor(allow=('/store/apps/details?')), callback='parseUrl'),
+        # Rule(LinkExtractor(allow=('/store/apps/details?')), follow=True, callback='parseUrl'),
         )
 
     def parseName(self, name):
-        return name.translate({ord(i): None for i in '$.?,;:/!@=+$#&'}).lower().replace(" ", "-")
+        return name.translate({ord(i): None for i in '$.?,;:/!@=+$#&\'\"'}).lower().replace(" ", "-")
 
 
     def parseUrl(self, response):
@@ -70,15 +70,11 @@ class GooglePlaySpider(CrawlSpider):
 
 
             if not isInDatabase:
-                # print("Add in DB")
                 self.addInDatabase(item)
-                # self.analyseApp(item["PackageName"], item["APK_URL"])
+                asyncio.run(self.analyseApp(item["PackageName"], item["APK_URL"]))
             elif isInDatabase and not isLatestVersion:
-                # print("Update in DB")
                 self.updateInDatabase(item)
-                # self.analyseApp(item["PackageName"], item["APK_URL"])
-            # else:
-                # print("Nothing to do")
+                asyncio.run(self.analyseApp(item["PackageName"], item["APK_URL"]))
 
         yield item
 
@@ -91,12 +87,12 @@ class GooglePlaySpider(CrawlSpider):
 
         cur = conn.cursor()
 
-        sql_name = "SELECT \"ID\" from project WHERE \"PACKAGE_NAME\"='%s'" % (packageName)
+        sql_name = "SELECT \"ID\" from public.test4 WHERE \"PACKAGE_NAME\"='%s'" % (packageName)
         cur.execute(sql_name)
         id_name = cur.fetchone()
 
         if id_name:
-            sql_version = "SELECT \"ID\" from project WHERE \"PACKAGE_NAME\"='%s' AND \"VERSION_APP\"='%s'" % (packageName, version)
+            sql_version = "SELECT \"ID\" from public.test4 WHERE \"PACKAGE_NAME\"='%s' AND \"VERSION_APP\"='%s'" % (packageName, version)
             cur.execute(sql_version)
             id_version = cur.fetchone()
 
@@ -121,7 +117,7 @@ class GooglePlaySpider(CrawlSpider):
 
         cur = conn.cursor()
 
-        sql = "INSERT INTO project(\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") VALUES ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s')" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", " ")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(" Buy", "").replace("€", "")), item["APK_URL"])
+        sql = "INSERT INTO public.test4(\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") VALUES ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s')" % (item["PackageName"], item["Name"][0].replace("'", " ").replace('"', ' '), item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", " ")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(" Buy", "").replace("€", "")), item["APK_URL"])
         cur.execute(sql)
 
         conn.commit()
@@ -137,7 +133,7 @@ class GooglePlaySpider(CrawlSpider):
 
         cur = conn.cursor()
 
-        sql = "UPDATE project SET (\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") = ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s')" % (item["PackageName"], item["Name"][0], item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(",", ".")), item["APK_URL"])
+        sql = "UPDATE public.test4 SET (\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") = ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s')" % (item["PackageName"], item["Name"][0].replace("'", " ").replace('"', ' '), item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(",", ".")), item["APK_URL"])
         cur.execute(sql)
 
         conn.commit()
@@ -146,9 +142,9 @@ class GooglePlaySpider(CrawlSpider):
 
         return True
 
-    def analyseApp(self, packageName, url):
-        subprocess.run(["python3", "download_apk.py", packageName, url], check=True)
-
+    async def analyseApp(self, packageName, url):
+        proc = await asyncio.create_subprocess_exec("python3", "../../backend/scripts/download_apk.py", packageName, url)
+        await proc.wait()
 
 
 # # # -- Table: public.test1
@@ -178,7 +174,7 @@ class GooglePlaySpider(CrawlSpider):
 # # # ALTER TABLE public.test1
 # # #     OWNER to postgres;
 
-# CREATE TABLE IF NOT EXISTS "projectDB" (
+# CREATE TABLE IF NOT EXISTS "public.test4DB" (
 # 	"ID" serial,
 # 	"PACKAGE_NAME" text,
 # 	"NAME_APP" text,
