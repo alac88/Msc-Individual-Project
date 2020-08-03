@@ -36,3 +36,13 @@ app.get('/app', (req, res) => {
     res.status(500).send(error);
   })
 })
+
+app.get('/categories', (req, res) => {
+  database.getCategories()
+  .then(response => {
+    res.status(200).send(response);
+  })
+  .catch(error => {
+    res.status(500).send(error);
+  })
+})

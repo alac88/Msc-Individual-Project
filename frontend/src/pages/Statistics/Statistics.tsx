@@ -19,9 +19,11 @@ const databaseUrl ="localhost";
 function Statistics(props: any) {
 
     const [appsList, setApps] = useState(Array<AppProps>());
+    const [categoriesList, setCategoriesList] = useState(Array());
 
     useEffect(() => {
         getApps();
+        getCategories();
     }, []);
 
     function getApps() {
@@ -34,19 +36,44 @@ function Statistics(props: any) {
             });
     }
 
+    function getCategories() {
+        fetch(`http://${databaseUrl}:3001/categories`)
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                setCategoriesList(data);
+            });
+    }
 
-        return (
-            <div className="container">
-                <h1>Statistics</h1>
-                <p><b>Total number of apps: </b>{appsList.length}</p>
-                <p>Number of categories:</p>
-                <p>Number in each category:</p>
-                <table>
-                    <tr></tr>
-                </table>
-                <p>Crawler running time:</p>
-            </div>
-        );
+
+    return (
+        <div className="container">
+            <h1>Statistics</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">Category</th>
+                        <th scope="col">Number of apps</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {categoriesList.map((cat: any) => {
+                        return (
+                            <tr>
+                                <th>{cat.CATEGORY}</th>
+                                <th>{cat.count}</th>
+                            </tr>
+                        );
+                    })}
+                    <tr className="total">
+                        <th>Total number of apps</th>
+                        <th>{appsList.length}</th>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    );
 }
 
 export default Statistics;

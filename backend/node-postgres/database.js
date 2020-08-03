@@ -22,7 +22,7 @@ function isNormalInteger(str) {
 
 function getAllApps(){
   return new Promise(function(resolve, reject) {
-    pool.query(`SELECT * FROM public.test3 ORDER BY "ID" ASC`, (error, results) => {
+    pool.query(`SELECT * FROM public.test4 ORDER BY "ID" ASC`, (error, results) => {
       if (error) {
         console.log("Erreur: ", error);
         reject(error)
@@ -35,7 +35,7 @@ function getAllApps(){
 function getAppsByName(name, max){
   if (max && isNormalInteger(max)){
     return new Promise(function(resolve, reject) {
-      pool.query(`SELECT * FROM public.test3 WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
+      pool.query(`SELECT * FROM public.test4 WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
         if (error) {
           console.log("Erreur: ", error);
           reject(error)
@@ -45,7 +45,7 @@ function getAppsByName(name, max){
     }) 
   } else {
     return new Promise(function(resolve, reject) {
-      pool.query(`SELECT * FROM public.test3 WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') ORDER BY "ID" ASC`, (error, results) => {
+      pool.query(`SELECT * FROM public.test4 WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') ORDER BY "ID" ASC`, (error, results) => {
         if (error) {
           console.log("Erreur: ", error);
           reject(error)
@@ -59,7 +59,7 @@ function getAppsByName(name, max){
 function getAppsByCategory(category, max){
   if (max && isNormalInteger(max)){
     return new Promise(function(resolve, reject) {
-      pool.query(`SELECT * FROM public.test3 WHERE "CATEGORY"='${category}' ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
+      pool.query(`SELECT * FROM public.test4 WHERE "CATEGORY"='${category}' ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
         if (error) {
           console.log("Erreur: ", error);
           reject(error)
@@ -69,7 +69,7 @@ function getAppsByCategory(category, max){
     }) 
   } else {
     return new Promise(function(resolve, reject) {
-      pool.query(`SELECT * FROM public.test3 WHERE "CATEGORY"='${category}' ORDER BY "ID" ASC`, (error, results) => {
+      pool.query(`SELECT * FROM public.test4 WHERE "CATEGORY"='${category}' ORDER BY "ID" ASC`, (error, results) => {
         if (error) {
           console.log("Erreur: ", error);
           reject(error)
@@ -82,7 +82,7 @@ function getAppsByCategory(category, max){
 
 function getSomeApps(max){
   return new Promise(function(resolve, reject) {
-    pool.query(`SELECT * FROM public.test3 ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
+    pool.query(`SELECT * FROM public.test4 ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
       if (error) {
         console.log("Erreur: ", error);
         reject(error)
@@ -95,7 +95,7 @@ function getSomeApps(max){
 function getAppsByNameAndCategory(name, category, max){
   if (max && isNormalInteger(max)){
     return new Promise(function(resolve, reject) {
-      pool.query(`SELECT * FROM public.test3 WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') AND "CATEGORY"='${category}' ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
+      pool.query(`SELECT * FROM public.test4 WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') AND "CATEGORY"='${category}' ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
         if (error) {
           console.log("Erreur: ", error);
           reject(error)
@@ -105,7 +105,7 @@ function getAppsByNameAndCategory(name, category, max){
     }) 
   } else {
     return new Promise(function(resolve, reject) {
-      pool.query(`SELECT * FROM public.test3 WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') AND "CATEGORY"='${category}' ORDER BY "ID" ASC`, (error, results) => {
+      pool.query(`SELECT * FROM public.test4 WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') AND "CATEGORY"='${category}' ORDER BY "ID" ASC`, (error, results) => {
         if (error) {
           console.log("Erreur: ", error);
           reject(error)
@@ -132,7 +132,19 @@ const getApps = (name, category, max) => {
 
 const getAppByPackageName = (packageName) => {
   return new Promise(function(resolve, reject) {
-    pool.query(`SELECT * FROM public.test3 WHERE "PACKAGE_NAME"='${packageName}'`, (error, results) => {
+    pool.query(`SELECT * FROM public.test4 WHERE "PACKAGE_NAME"='${packageName}'`, (error, results) => {
+      if (error) {
+        console.log("Erreur: ", error);
+        reject(error)
+      }
+      resolve(results.rows);
+    })
+  }) 
+}
+
+const getCategories = (categoryName) => {
+  return new Promise(function(resolve, reject) {
+    pool.query(`SELECT "CATEGORY", COUNT(*) FROM public.test4 WHERE "CATEGORY" IN (SELECT DISTINCT "CATEGORY" FROM public.test4) GROUP BY "CATEGORY";`, (error, results) => {
       if (error) {
         console.log("Erreur: ", error);
         reject(error)
@@ -145,4 +157,5 @@ const getAppByPackageName = (packageName) => {
 module.exports = {
   getApps,
   getAppByPackageName,
+  getCategories,
 }
