@@ -69,7 +69,7 @@ function ComparisonModal(props: any) {
                             // console.log(app);
                             return (
                                 <tr>
-                                    <th>{app.NAME_APP}</th>
+                                    <th className="name">{app.NAME_APP}</th>
                                     {app.VIRUS_TOTAL ?
                                         <>
                                         <th className="securityScore">{getSecurityScore(app)}</th>

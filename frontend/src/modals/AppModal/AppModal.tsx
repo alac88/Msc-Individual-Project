@@ -65,19 +65,19 @@ function AppModal(props: any) {
                   <thead>
                     <tr>
                         <th scope="col">App Name</th>
+                        <th scope="col">Security Score</th>
                         {Object.keys(props.app[0].VIRUS_TOTAL.results).map((key) => {
                           return <th>{key}</th>;
                         })}
-                        <th scope="col">Security Score</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                        <th>{props.app[0].NAME_APP}</th>
+                        <th className="name">{props.app[0].NAME_APP}</th>
+                        <th className="securityScore">{getSecurityScore()}</th>
                         {Object.keys(props.app[0].VIRUS_TOTAL.results).map((key) => {
                           return <th>{props.app[0].VIRUS_TOTAL.results[key].category}</th>;
                         })}
-                        <th>{getSecurityScore()}</th>
                     </tr>
                   </tbody>
                   </table>
