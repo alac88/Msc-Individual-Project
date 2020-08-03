@@ -11,7 +11,7 @@ function Block(props: Props){
     function renderImageSwitch(){
         switch (props.type) {
             case "info":
-                return (<img className="imgContainer" src="https://cdn.pixabay.com/photo/2016/03/31/19/13/information-1294813_1280.png" />);
+                return (<img className="imgContainer" src="img/questions.jpg" />);
             case "statistics":
                 return (<img className="imgContainer" src="img/stats.jpg"/>);
             case "git":
