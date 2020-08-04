@@ -7,17 +7,17 @@ from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
 from project.items import GooglePlayItem
 
+HOST = "localhost"
+USER = "postgres"
+PASSWORD = "testdb"
+DATABASE = "imperial"
+PORT = "5432"
+
 # HOST = "localhost"
 # USER = "postgres"
 # PASSWORD = "testdb"
 # DATABASE = "imperial_db"
 # PORT = "5432"
-
-HOST = "localhost"
-USER = "postgres"
-PASSWORD = "testdb"
-DATABASE = "imperial_db"
-PORT = "5432"
 
 class GooglePlaySpider(CrawlSpider):
     name = "googleplay"
@@ -87,12 +87,12 @@ class GooglePlaySpider(CrawlSpider):
 
         cur = conn.cursor()
 
-        sql_name = "SELECT \"ID\" from public.test4 WHERE \"PACKAGE_NAME\"='%s'" % (packageName)
+        sql_name = "SELECT \"ID\" from project WHERE \"PACKAGE_NAME\"='%s'" % (packageName)
         cur.execute(sql_name)
         id_name = cur.fetchone()
 
         if id_name:
-            sql_version = "SELECT \"ID\" from public.test4 WHERE \"PACKAGE_NAME\"='%s' AND \"VERSION_APP\"='%s'" % (packageName, version)
+            sql_version = "SELECT \"ID\" from project WHERE \"PACKAGE_NAME\"='%s' AND \"VERSION_APP\"='%s'" % (packageName, version)
             cur.execute(sql_version)
             id_version = cur.fetchone()
 
@@ -117,7 +117,7 @@ class GooglePlaySpider(CrawlSpider):
 
         cur = conn.cursor()
 
-        sql = "INSERT INTO public.test4(\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") VALUES ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s')" % (item["PackageName"], item["Name"][0].replace("'", " ").replace('"', ' '), item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", " ")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(" Buy", "").replace("€", "")), item["APK_URL"])
+        sql = "INSERT INTO project(\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") VALUES ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s')" % (item["PackageName"], item["Name"][0].replace("'", " ").replace('"', ' '), item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", " ")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(" Buy", "").replace("€", "")), item["APK_URL"])
         cur.execute(sql)
 
         conn.commit()
@@ -133,7 +133,7 @@ class GooglePlaySpider(CrawlSpider):
 
         cur = conn.cursor()
 
-        sql = "UPDATE public.test4 SET (\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") = ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s')" % (item["PackageName"], item["Name"][0].replace("'", " ").replace('"', ' '), item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(",", ".")), item["APK_URL"])
+        sql = "UPDATE project SET (\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") = ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s')" % (item["PackageName"], item["Name"][0].replace("'", " ").replace('"', ' '), item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(",", ".")), item["APK_URL"])
         cur.execute(sql)
 
         conn.commit()
@@ -174,7 +174,7 @@ class GooglePlaySpider(CrawlSpider):
 # # # ALTER TABLE public.test1
 # # #     OWNER to postgres;
 
-# CREATE TABLE IF NOT EXISTS "public.test4DB" (
+# CREATE TABLE IF NOT EXISTS "projectDB" (
 # 	"ID" serial,
 # 	"PACKAGE_NAME" text,
 # 	"NAME_APP" text,

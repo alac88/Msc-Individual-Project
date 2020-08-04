@@ -36,7 +36,7 @@ def updateInDatabase(analysis):
 
 	cur = conn.cursor()
 	print("update DB with virustotal")
-	sql = "UPDATE public.test4 SET \"VIRUS_TOTAL\" = \'" + str(analysis).replace("\'", "\"" ).replace("None", "\"None\"") + "\' WHERE \"PACKAGE_NAME\" = '" + sys.argv[1] + "' "
+	sql = "UPDATE project SET \"VIRUS_TOTAL\" = \'" + str(analysis).replace("\'", "\"" ).replace("None", "\"None\"") + "\' WHERE \"PACKAGE_NAME\" = '" + sys.argv[1] + "' "
 	print(sql)
 	cur.execute(sql)
 
