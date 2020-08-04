@@ -86,7 +86,7 @@ function ComparisonModal(props: any) {
             </Modal.Body>
             <Modal.Footer>
             <div className="button">
-                <input type="submit" name="download" value="Download (.xls)" className="success" />
+                <input type="submit" name="download" value="Download (.xlsx)" className="success" />
             </div>
             <div className="button">
                 <input
