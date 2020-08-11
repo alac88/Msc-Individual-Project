@@ -27,15 +27,15 @@ app.get('/', (req, res) => {
   })
 })
 
-app.get('/app', (req, res) => {
-  database.getAppByPackageName(req.query.packageName)
-  .then(response => {
-    res.status(200).send(response);
-  })
-  .catch(error => {
-    res.status(500).send(error);
-  })
-})
+// app.get('/app', (req, res) => {
+//   database.getAppByPackageName(req.query.packageName)
+//   .then(response => {
+//     res.status(200).send(response);
+//   })
+//   .catch(error => {
+//     res.status(500).send(error);
+//   })
+// })
 
 app.get('/categories', (req, res) => {
   database.getCategories()
@@ -45,4 +45,16 @@ app.get('/categories', (req, res) => {
   .catch(error => {
     res.status(500).send(error);
   })
+})
+
+app.get('/compareApps', (req, res) => {
+
+  const { spawn } = require('child_process');
+  const pythonAnalysis = spawn('python', ['/Users/alexandrelac/Documents/Projects/Individual/Msc-Individual-Project/backend/scripts/run_analysis.py', req.query.apps]);
+
+  pythonAnalysis.stdout.on('data', function(data) {
+      // console.log(data.toString());
+      res.write(data);
+      res.end();
+  });
 })

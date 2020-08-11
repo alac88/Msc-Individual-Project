@@ -1,6 +1,8 @@
 import React from "react";
 import Modal from "react-bootstrap/Modal";
 import "./ComparisonModal.scss";
+import VirusTotalAnalysis from "../../analysis/VirusTotalAnalysis";
+import FlowdroidAnalysis from "../../analysis/FlowdroidAnalysis";
 
 // interface AppProps{
 //     ID: number, 
@@ -30,17 +32,17 @@ function ComparisonModal(props: any) {
         document.getElementById("modal")?.classList.remove("modal");
     };
 
-    function getSecurityScore(app: any){
-        var securityScore = 0;
-        var count = 0;
-        Object.keys(app.VIRUS_TOTAL.stats).map((cat) => {
-            count += app.VIRUS_TOTAL.stats[cat];
-            if ((cat == "malicious") || (cat == "suspicious") ){
-                securityScore += app.VIRUS_TOTAL.stats[cat];
-            }
-        })
-        return securityScore / count;
-    }
+    // function getSecurityScore(app: any){
+    //     var securityScore = 0;
+    //     var count = 0;
+    //     Object.keys(app.VIRUS_TOTAL.stats).map((cat) => {
+    //         count += app.VIRUS_TOTAL.stats[cat];
+    //         if ((cat == "malicious") || (cat == "suspicious") ){
+    //             securityScore += app.VIRUS_TOTAL.stats[cat];
+    //         }
+    //     })
+    //     return securityScore / count;
+    // }
 
     return (
         <div id="modal">
@@ -53,50 +55,50 @@ function ComparisonModal(props: any) {
             <Modal.Header>
             <Modal.Title>Comparison Analysis</Modal.Title>
             </Modal.Header>
+
             <Modal.Body>
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">App Name</th>
-                        <th scope="col">Security Score</th>
-                        {Object.keys(props.appsChecked[0].VIRUS_TOTAL.results).map((key) => {
-                            return <th>{key}</th>;
-                        })}
-                    </tr>
-                    </thead>
-                    <tbody>
-                        {props.appsChecked.map((app: any) => {
-                            // console.log(app);
-                            return (
-                                <tr>
-                                    <th className="name">{app.NAME_APP}</th>
-                                    {app.VIRUS_TOTAL ?
-                                        <>
-                                        <th className="securityScore">{getSecurityScore(app)}</th>
-                                        {Object.keys(app.VIRUS_TOTAL.results).map((key) => {
-                                            return <th>{app.VIRUS_TOTAL.results[key].category}</th>;
-                                        })}
-                                        </>
-                                    : <th>Analysis not available</th>}
-                                </tr>
-                            );
-                        })}
-                </tbody>
-                </table>
+
+                {(props.appsChecked.length == 1) &&
+                    <>
+                    <h2>Information</h2>
+                    <div className="row"><b>ID: </b>{props.appsChecked[0].ID}</div>
+                    <div className="row"><b>App Name: </b>{props.appsChecked[0].NAME_APP}</div>
+                    <div className="row"><b>Package Name: </b>{props.appsChecked[0].PACKAGE_NAME}</div>
+                    <div className="row"><b>Size: </b>{props.appsChecked[0].SIZE_APP}</div>
+                    <div className="row"><b>Last Update: </b>{props.appsChecked[0].UPDATED}</div>
+                    <div className="row"><b>App Version: </b>{props.appsChecked[0].VERSION_APP}</div>
+                    <div className="row"><b>Android Minimum Version: </b>{props.appsChecked[0].ANDROID_MIN_VERSION}</div>
+                    <div className="row"><b>Installs: </b>{props.appsChecked[0].INSTALLS}</div>
+                    <div className="row"><b>Category: </b>{props.appsChecked[0].CATEGORY}</div>
+                    <div className="row"><b>Price: </b>{props.appsChecked[0].PRICE}</div>
+                    <div className="row"><b>Ratings: </b>{props.appsChecked[0].RATINGS}</div>
+                    <div className="row"><b>Offered By: </b>{props.appsChecked[0].OFFERED_BY}</div>
+                </>
+
+                }
+
+                <div className="analysis">
+                    <h2>Analysis</h2>
+                    <VirusTotalAnalysis appsChecked={props.appsChecked} />
+                    <FlowdroidAnalysis appsChecked={props.appsChecked} />
+                </div>
             </Modal.Body>
+
             <Modal.Footer>
-            <div className="button">
-                <input type="submit" name="download" value="Download (.xlsx)" className="success" />
-            </div>
-            <div className="button">
-                <input
-                type="submit"
-                name="close"
-                value="Close"
-                className="danger"
-                onClick={props.onHide}
-                />
-            </div>
+                {(props.appsChecked.length > 1) &&
+                <div className="button">
+                    <input type="submit" name="download" value="Download (.xlsx)" className="success" />
+                </div>
+                }
+                <div className="button">
+                    <input
+                    type="submit"
+                    name="close"
+                    value="Close"
+                    className="danger"
+                    onClick={props.onHide}
+                    />
+                </div>
             </Modal.Footer>
         </Modal>
         </div>

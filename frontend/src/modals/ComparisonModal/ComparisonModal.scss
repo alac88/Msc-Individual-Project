@@ -45,30 +45,37 @@
             flex: 1 1 auto;
             padding: 1rem;
             overflow-y: scroll;
-            
-            
-            thead tr{
-                background-color: #eee !important;
-            }
-            
-            tr:nth-child(even) {
-                background-color: #eee;
-            }
-            tr:nth-child(odd) {
-                background-color: #fff;
-            }
-            
-            table th{
-                padding:10px;
-            }
-            
-            tbody th{
-                font-weight: 400;
 
-                &.securityScore, &.name{
-                    font-weight: bold;
+            .row{
+                padding: 10px 0;
+            }
+            
+            .analysis{
+
+                thead tr{
+                    background-color: #eee !important;
+                }
+                
+                tr:nth-child(even) {
+                    background-color: #eee;
+                }
+                tr:nth-child(odd) {
+                    background-color: #fff;
+                }
+                
+                table th{
+                    padding:10px;
+                }
+                
+                tbody th{
+                    font-weight: 400;
+    
+                    &.securityScore, &.name{
+                        font-weight: bold;
+                    }
                 }
             }
+            
         }
     
         .modal-footer{

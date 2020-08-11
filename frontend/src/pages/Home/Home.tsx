@@ -5,8 +5,6 @@ import React, {
 import Card from '../../components/Card';
 import SearchBar from '../../components/SearchBar';
 import Block from '../../components/Block';
-// import AppList from '../../components/AppList';
-import AppModal from '../../modals/AppModal';
 import ComparisonModal from '../../modals/ComparisonModal';
 import './Home.scss';
 
@@ -31,13 +29,11 @@ interface AppProps{
 function Home(props: any) {
 
     const [appsList, setApps] = useState(Array<AppProps>());
-    const [modalShow, setModalShow] = useState(false);
     
     const [appSelected, setAppSelected] = useState<AppProps>();
     
     const [checkedApps, setCheckedApps] = useState(Array<AppProps>());
 
-    // const [state, setState] = useState(false);
     const [showComparisonModal, setShowComparisonModal] = useState(false);
 
     const query = new URLSearchParams(props.location.search);
@@ -54,38 +50,41 @@ function Home(props: any) {
             .then(data => {
                 setApps(data);
             });
+        }
+        
+    function compareApps(apps: Array<AppProps>){
+        fetch(`http://${databaseUrl}:3001/compareApps?apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
+            .then(response => {
+                return response.text();
+            })
+            .then(data => {
+                console.log(data);
+                // setApps(data);
+            });
     }
 
 
-    function getAppInfo(name: string) {
-        // fetch(`http://localhost:3001/app?packageName=${props.packageName}`)
-        fetch(`http://${databaseUrl}:3001/app?packageName=${name}`)
-        .then(response => {
-            return response.json();
-        })
-        .then(data => {
-            setAppSelected(data);
-        });
-    }
-
-    function openModal(name: string){
-        getAppInfo(name);
-        document.getElementById("overlay")?.classList.add('active');
-        setModalShow(true);
-    }
+    // function getAppInfo(name: string) {
+    //     // fetch(`http://localhost:3001/app?packageName=${props.packageName}`)
+    //     fetch(`http://${databaseUrl}:3001/app?packageName=${name}`)
+    //     .then(response => {
+    //         return response.json();
+    //     })
+    //     .then(data => {
+    //         setAppSelected(data);
+    //     });
+    // }
 
     function openComparisonModal(){
-        document.getElementById("overlay")?.classList.add('active');
-        setShowComparisonModal(true);
+        compareApps(checkedApps);
+
+        // document.getElementById("overlay")?.classList.add('active');
+        // console.log(checkedApps);
+        // setShowComparisonModal(true);
     }
 
     function closeModal(isComparisonModal=false){
-        if (!isComparisonModal){
-            setModalShow(false);
-            setAppSelected(undefined);
-        } else {
-            setShowComparisonModal(false);
-        }
+        setShowComparisonModal(false);
         document.getElementById("overlay")?.classList.remove('active');
     }
 
@@ -143,6 +142,22 @@ function Home(props: any) {
         return false;
     }
 
+    function openAppModal(packageName: string){
+
+        var checkbox = document.getElementById(packageName);
+
+        if (checkbox){
+            
+            checkbox.setAttribute("checked", "checked");
+                    var app = getAppFullData(checkbox.id);
+                    if (app) {
+                        setCheckedApps([app]);
+                    }
+    
+            openComparisonModal();
+        }
+    }
+
     function renderApps(){
         return (
             <div className="bottomBar">
@@ -161,7 +176,7 @@ function Home(props: any) {
                 {appsList.map((app) => (
                     <div className="row">
                         <input key={"checkbox"+app.ID} id={app.PACKAGE_NAME} onChange={() => checkApp(app.PACKAGE_NAME)} name="checkbox" type="checkbox" checked={isChecked(app)}/>
-                        <Card select={() => openModal(app.PACKAGE_NAME)} key={app.ID} id={app.ID} name={app.NAME_APP} packageName={app.PACKAGE_NAME} version={app.VERSION_APP} category={app.CATEGORY} price={app.PRICE} ratings={app.RATINGS} ></Card>
+                        <Card select={() => openAppModal(app.PACKAGE_NAME)} key={app.ID} id={app.ID} name={app.NAME_APP} packageName={app.PACKAGE_NAME} version={app.VERSION_APP} category={app.CATEGORY} price={app.PRICE} ratings={app.RATINGS} ></Card>
                     </div>
                 ))}
             </div>
@@ -176,22 +191,20 @@ function Home(props: any) {
                     <Block type="statistics"  url="/statistics"></Block>
                     <Block type="git"  url="https://github.com/alac88/Msc-Individual-Project"></Block>
                 </div>
-                {appSelected && <AppModal
-                    app={appSelected}
-                    show={modalShow}
-                    onHide={() => closeModal()}
-                    />}
                 {showComparisonModal && <ComparisonModal
                     appsChecked={checkedApps}
                     show={showComparisonModal}
-                    onHide={() => closeModal(true)}
+                    onHide={() => closeModal()}
                     />}
                 <div className="appContainer">
                     <div className="topBar">
                         <div className="appNumber">{appsList.length} apps found</div>
-                        <div className="button">
-                            {/* <input type="submit" name="compare" value="Compare" className="danger" disabled={ getCheckedApps().length >= 2 ? false : true }/> */}
-                            <input type="submit" name="compare" value="Compare" className="danger" onClick={() => openComparisonModal() } disabled={ checkedApps.length >= 2 ? false : true }/>
+                        <div>
+                            <div className="button">
+                                {/* <input type="submit" name="compare" value="Compare" className="danger" disabled={ getCheckedApps().length >= 2 ? false : true }/> */}
+                                <input type="submit" name="compare" value="Compare" className="danger" onClick={() => openComparisonModal() } disabled={ checkedApps.length >= 2 ? false : true }/>
+                            </div>
+                            <div className="estimation">Estimated time: {checkedApps.length * 5} min (~5min/app)</div>
                         </div>
                     </div>
                     {renderApps()}
