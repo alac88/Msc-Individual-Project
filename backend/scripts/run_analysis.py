@@ -18,11 +18,11 @@ def main():
 	flowdroidAnalysis = []
 
 	appsList = sys.argv[1].split(",")
+	print(appsList)
 	i = 0
 	while i < len(appsList):
 		# print(appsList[i])
 		url = getURLFromDatabase(appsList[i])
-		print(url)
 		os.system("python3 download_apk.py " + url)
 		i += 1
 
@@ -33,7 +33,7 @@ def getURLFromDatabase(packageName):
 	conn = psycopg2.connect("host=%s dbname=%s user=%s password=%s port=%s" % (HOST, DATABASE, USER, PASSWORD, PORT))
 
 	cur = conn.cursor()
-	sql = "SELECT \"APK_URL\" from public.test4 WHERE \"PACKAGE_NAME\" = '" + packageName + "' "
+	sql = "SELECT \"APK_URL\" from project WHERE \"PACKAGE_NAME\" = '" + packageName + "' "
 	cur.execute(sql)
 
 	url = cur.fetchone()

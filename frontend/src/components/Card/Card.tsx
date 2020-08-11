@@ -2,7 +2,7 @@ import React from 'react';
 import './Card.scss'
 
 interface Props {
-    select(): any,
+    // select(): any,
     id: number,
     name: string,
     packageName: string,
@@ -16,7 +16,8 @@ interface Props {
 function Card(props: Props){
 
     return (
-        <div onClick={() => props.select()} className="card">
+        <div className="card">
+        {/* <div onClick={() => props.select()} className="card"> */}
 
             <div className="mainRow">
 

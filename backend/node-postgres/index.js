@@ -47,6 +47,26 @@ app.get('/categories', (req, res) => {
   })
 })
 
+app.get('/VTanalysis', (req, res) => {
+  database.getCategories()
+  .then(response => {
+    res.status(200).send(response);
+  })
+  .catch(error => {
+    res.status(500).send(error);
+  })
+})
+
+// app.get('/flowdroidAnalysis', (req, res) => {
+//   database.getCategories()
+//   .then(response => {
+//     res.status(200).send(response);
+//   })
+//   .catch(error => {
+//     res.status(500).send(error);
+//   })
+// })
+
 app.get('/compareApps', (req, res) => {
 
   const { spawn } = require('child_process');

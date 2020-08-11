@@ -12,6 +12,8 @@ def main():
     # packageName = sys.argv[1]
     url = sys.argv[1]
 
+    print("download_apk.py entered with url: ", url)
+
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
     # prefs = {'download.default_directory' : '/Users/alexandrelac/Documents/Projects/Individual/Msc-Individual-Project/backend/scripts/apk'}; 

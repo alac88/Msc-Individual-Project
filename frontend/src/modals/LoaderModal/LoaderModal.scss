@@ -1,4 +1,4 @@
-.comparisonModal{
+.loaderModal{
     z-index: 1050;
     &.active{
         z-index: 1050;
@@ -9,8 +9,9 @@
     left: 50%;
     right: auto;
     bottom: auto;
-    height: 75%;
-    width: 75%;
+    height: auto;
+    width: 25%;
+    text-align: center;
     transform: translate(-50%, -50%);
 
     .modal-dialog{
@@ -32,7 +33,7 @@
         .modal-header{
             display: flex;
             align-items: flex-start;
-            justify-content: space-between;
+            justify-content: center;
             font-weight: bold;
             padding: 1rem;
             border-bottom: 1px solid #dee2e6;
@@ -45,36 +46,6 @@
             flex: 1 1 auto;
             padding: 1rem;
             overflow-y: scroll;
-
-            .row{
-                padding: 10px 0;
-            }
-            
-            .analysis{
-
-                thead tr{
-                    background-color: #eee !important;
-                }
-                
-                tr:nth-child(even) {
-                    background-color: #eee;
-                }
-                tr:nth-child(odd) {
-                    background-color: #fff;
-                }
-                
-                table th{
-                    padding:10px;
-                }
-                
-                tbody th{
-                    font-weight: 400;
-    
-                    &.securityScore, &.name{
-                        font-weight: bold;
-                    }
-                }
-            }
             
         }
     

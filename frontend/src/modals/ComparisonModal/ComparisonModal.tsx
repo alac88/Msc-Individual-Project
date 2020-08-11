@@ -50,7 +50,7 @@ function ComparisonModal(props: any) {
             show={props.show}
             onEnter={setOverlay}
             onExit={onExit}
-            dialogClassName={"primaryModal"}
+            dialogClassName={"comparisonModal"}
         >
             <Modal.Header>
             <Modal.Title>Comparison Analysis</Modal.Title>

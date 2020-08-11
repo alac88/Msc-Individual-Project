@@ -14,7 +14,8 @@ function Counter(props: Props){
             <div>{props.name}</div>
             <div className="appsNumber">
                 <div className="counterButton" onClick={() => (count > 0) && setCount(count - 1)}><span>-</span></div>
-                <input placeholder="All" name={props.name} id="count" className="counter" value={count}/>
+                {/* <input placeholder="All" name={props.name} id="count" className="counter" value={count}/> */}
+                <input placeholder="All" name={props.name} id="count" className="counter" defaultValue={count}/>
                 <div className="counterButton" onClick={() => setCount(count + 1)}><span>+</span></div>
             </div>
         </div>

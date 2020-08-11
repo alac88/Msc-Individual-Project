@@ -24,7 +24,7 @@ function VirusTotalAnalysis(props: any){
                     <tbody>
                         {props.appsChecked.map((app: any) => {
                             return (
-                                <tr>
+                                <tr key={app+"-tr"}>
                                     <th className="name">{app.NAME_APP}</th>
                                     {app.VIRUS_TOTAL ?
                                         <>

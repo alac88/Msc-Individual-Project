@@ -6,6 +6,7 @@ import Card from '../../components/Card';
 import SearchBar from '../../components/SearchBar';
 import Block from '../../components/Block';
 import ComparisonModal from '../../modals/ComparisonModal';
+import LoaderModal from '../../modals/LoaderModal';
 import './Home.scss';
 
 const databaseUrl = "localhost";
@@ -36,6 +37,12 @@ function Home(props: any) {
 
     const [showComparisonModal, setShowComparisonModal] = useState(false);
 
+    const [showLoader, setShowLoader] = useState(false);
+
+    const [VTanalysis, setVTanalysis] = useState();
+
+    const [flowDroidnalysis, setFlowdroidAnalysis] = useState();
+
     const query = new URLSearchParams(props.location.search);
     
     useEffect(() => {
@@ -58,33 +65,51 @@ function Home(props: any) {
                 return response.text();
             })
             .then(data => {
-                console.log(data);
+                console.log('compareApps data: ', data);
+                setShowLoader(false);
+                console.log("Loader false");
+                // getAppsVirusTotalAnalysis(checkedApps);
+                // getAppsFlowdroidAnalysis(checkedApps);
+                setShowComparisonModal(true);
                 // setApps(data);
             });
-    }
+        }
 
+        function getAppsVirusTotalAnalysis(apps: Array<AppProps>){
+            fetch(`http://${databaseUrl}:3001/VTanalysis?apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
+                .then(response => {
+                    return response.text();
+                })
+                .then(data => {
+                        console.log('VTanalysis data: ', data);
+                        // setVTanalysis(data);
+                    });
+        }
 
-    // function getAppInfo(name: string) {
-    //     // fetch(`http://localhost:3001/app?packageName=${props.packageName}`)
-    //     fetch(`http://${databaseUrl}:3001/app?packageName=${name}`)
-    //     .then(response => {
-    //         return response.json();
-    //     })
-    //     .then(data => {
-    //         setAppSelected(data);
-    //     });
-    // }
+        function getAppsFlowdroidAnalysis(apps: Array<AppProps>){
+            fetch(`http://${databaseUrl}:3001/flowdroidAnalysis?apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
+                .then(response => {
+                    return response.text();
+                })
+                .then(data => {
+                        console.log('flowdroidAnalysis data: ', data);
+                        // setFlowdroidAnalysis(data);
+                    });
+        }
 
     function openComparisonModal(){
+        console.log("Loader true: ", checkedApps);
+        document.getElementById("overlay")?.classList.add('active');
+        setShowLoader(true);
         compareApps(checkedApps);
-
-        // document.getElementById("overlay")?.classList.add('active');
-        // console.log(checkedApps);
-        // setShowComparisonModal(true);
     }
 
     function closeModal(isComparisonModal=false){
-        setShowComparisonModal(false);
+        if (isComparisonModal){
+            setShowComparisonModal(false);
+        } else {
+            setShowLoader(false);
+        }
         document.getElementById("overlay")?.classList.remove('active');
     }
 
@@ -115,7 +140,7 @@ function Home(props: any) {
             // If already checked
             if (checkbox.hasAttribute("checked") && (checkbox.getAttribute("checked") == "checked") ){
                 checkbox.removeAttribute("checked");
-                var newCheckedApps = checkedApps.filter((el) => el.PACKAGE_NAME == checkbox?.id)
+                var newCheckedApps = checkedApps.filter((el) => el.PACKAGE_NAME != checkbox?.id);
                 setCheckedApps(newCheckedApps);
             } 
             // If not checked yet
@@ -142,22 +167,6 @@ function Home(props: any) {
         return false;
     }
 
-    function openAppModal(packageName: string){
-
-        var checkbox = document.getElementById(packageName);
-
-        if (checkbox){
-            
-            checkbox.setAttribute("checked", "checked");
-                    var app = getAppFullData(checkbox.id);
-                    if (app) {
-                        setCheckedApps([app]);
-                    }
-    
-            openComparisonModal();
-        }
-    }
-
     function renderApps(){
         return (
             <div className="bottomBar">
@@ -174,9 +183,10 @@ function Home(props: any) {
                         </div>
                 </div>
                 {appsList.map((app) => (
-                    <div className="row">
-                        <input key={"checkbox"+app.ID} id={app.PACKAGE_NAME} onChange={() => checkApp(app.PACKAGE_NAME)} name="checkbox" type="checkbox" checked={isChecked(app)}/>
-                        <Card select={() => openAppModal(app.PACKAGE_NAME)} key={app.ID} id={app.ID} name={app.NAME_APP} packageName={app.PACKAGE_NAME} version={app.VERSION_APP} category={app.CATEGORY} price={app.PRICE} ratings={app.RATINGS} ></Card>
+                    <div key={app.ID} className="row">
+                        <input id={app.PACKAGE_NAME} onChange={() => checkApp(app.PACKAGE_NAME)} name="checkbox" type="checkbox" checked={isChecked(app)}/>
+                        <Card id={app.ID} name={app.NAME_APP} packageName={app.PACKAGE_NAME} version={app.VERSION_APP} category={app.CATEGORY} price={app.PRICE} ratings={app.RATINGS} ></Card>
+                        {/* <Card select={() => openAppModal(app.PACKAGE_NAME)} key={app.ID} id={app.ID} name={app.NAME_APP} packageName={app.PACKAGE_NAME} version={app.VERSION_APP} category={app.CATEGORY} price={app.PRICE} ratings={app.RATINGS} ></Card> */}
                     </div>
                 ))}
             </div>
@@ -191,10 +201,14 @@ function Home(props: any) {
                     <Block type="statistics"  url="/statistics"></Block>
                     <Block type="git"  url="https://github.com/alac88/Msc-Individual-Project"></Block>
                 </div>
+                {showLoader && <LoaderModal 
+                    show={showLoader} 
+                    onCancel={() => closeModal()}
+                    />}
                 {showComparisonModal && <ComparisonModal
                     appsChecked={checkedApps}
                     show={showComparisonModal}
-                    onHide={() => closeModal()}
+                    onHide={() => closeModal(true)}
                     />}
                 <div className="appContainer">
                     <div className="topBar">
@@ -202,7 +216,7 @@ function Home(props: any) {
                         <div>
                             <div className="button">
                                 {/* <input type="submit" name="compare" value="Compare" className="danger" disabled={ getCheckedApps().length >= 2 ? false : true }/> */}
-                                <input type="submit" name="compare" value="Compare" className="danger" onClick={() => openComparisonModal() } disabled={ checkedApps.length >= 2 ? false : true }/>
+                                <input type="submit" name="compare" value={checkedApps.length == 1 ? "Analyse" : (checkedApps.length > 1 ? "Compare" : "Select apps")} className="danger" onClick={() => openComparisonModal() } disabled={ checkedApps.length >= 1 ? false : true }/>
                             </div>
                             <div className="estimation">Estimated time: {checkedApps.length * 5} min (~5min/app)</div>
                         </div>
