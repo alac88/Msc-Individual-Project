@@ -8,9 +8,9 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def main(url):
-    packageName = sys.argv[1]
-    # url = sys.argv[2]
+def main():
+    # packageName = sys.argv[1]
+    url = sys.argv[1]
 
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')

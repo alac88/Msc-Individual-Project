@@ -1,7 +1,7 @@
 import sys
 import os
 import psycopg2
-import download_apk
+# import download_apk
 
 HOST = "localhost"
 USER = "postgres"
@@ -23,7 +23,7 @@ def main():
 		# print(appsList[i])
 		url = getURLFromDatabase(appsList[i])
 		print(url)
-		download_apk.main(url)
+		os.system("python3 download_apk.py " + url)
 		i += 1
 
 	os.system("sudo docker run --volume=/home/al3919/Projects/Msc-Individual-Project/backend/scripts/download:/apks alexmyg/andropytool -s /apks/ -all")
