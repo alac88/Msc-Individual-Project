@@ -1,10 +1,9 @@
 const path = require('path');
 const fs = require('fs');
 const csv = require("csvtojson/v2");
-const VTDirectoryPath = path.join(__dirname, '/home/al3919/Projects/Msc-Individual-Project/backend/scripts/download/VT_analysis');
-const flowdroidDirectoryPath = path.join(__dirname, '/home/al3919/Projects/Msc-Individual-Project/backend/scripts/download/FlowDroid_processed');
-// const VTDirectoryPath = path.join(__dirname, '../scripts/download/VT_analysis/');
-// const flowdroidPath = path.join(__dirname, '../scripts/download/FlowDroid_processed/flowdroid_global.csv');
+const VTDirectoryPath = path.join(__dirname, '../scripts/download/VT_analysis/');
+const flowdroidPath = path.join(__dirname, '../scripts/download/FlowDroid_processed/flowdroid_global.csv');
+const runAnalysisPath = path.join(__dirname, '../scripts/run_analysis.py')
 
 const express = require('express')
 const app = express()
@@ -62,6 +61,8 @@ app.get('/VTanalysis', (req, res) => {
         return console.log('Unable to scan directory: ' + err);
     } 
     files.forEach(function (file) {
+      console.log(file);
+      console.log(JSON.parse(fs.readFileSync(VTDirectoryPath + file).toString()));
       list.push({ "name": file, "content": JSON.parse(fs.readFileSync(VTDirectoryPath + file).toString())});
     });
     res.send(list);
@@ -78,10 +79,10 @@ app.get('/flowdroidAnalysis', (req, res) => {
 
 app.get('/compareApps', (req, res) => {
   const { spawn } = require('child_process');
-  // const pythonAnalysis = spawn('python3', ['/Users/alexandrelac/Documents/Projects/Individual/Msc-Individual-Project/backend/scripts/run_analysis.py', req.query.apps]);
-  const pythonAnalysis = spawn('python3', ['/home/al3919/Projects/Msc-Individual-Project/backend/scripts/run_analysis.py', req.query.apps]);
+  const pythonAnalysis = spawn('python3', [runAnalysisPath, req.query.apps]);
 
   pythonAnalysis.stdout.on('data', function(data) {
+      console.log(data);
       res.write(data);
       res.end();
   });

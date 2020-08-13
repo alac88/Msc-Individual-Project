@@ -8,7 +8,7 @@ USER = "postgres"
 PASSWORD = "testdb"
 DATABASE = "imperial"
 PORT = "5432"
-TABLE = "project"
+TABLE = "public.test4"
 
 API_KEY = 'a01255f309c75b3642163d9a522f1b761a8e7f9327b656031e2b874156336c04'
 
@@ -21,17 +21,22 @@ def main():
 	appsList = sys.argv[1].split(",")
 	# print(appsList)
 	i = 0
-	while i < len(appsList):
-		# print(appsList[i])
-		url = getURLFromDatabase(appsList[i])
-		# print(url)
-		os.system("python3 /home/al3919/Projects/Msc-Individual-Project/backend/scripts/download/download_apk.py " + url)
-		# os.system("python3 /Users/alexandrelac/Documents/Projects/Individual/Msc-Individual-Project/backend/scripts/download/download_apk.py " + url)
-		i += 1
 
-	# os.system("sudo docker run --volume=/home/al3919/Projects/Msc-Individual-Project/backend/scripts/download:/apks alexmyg/andropytool -s /apks/ -all")
+	try: 
+		while i < len(appsList):
+			# print(appsList[i])
+			url = getURLFromDatabase(appsList[i])
+			# print(url)
+			# os.system("python3 /home/al3919/Projects/Msc-Individual-Project/backend/scripts/download/download_apk.py " + url)
+			os.system("python3 /Users/alexandrelac/Documents/Projects/Individual/Msc-Individual-Project/backend/scripts/download/download_apk.py " + url)
+			i += 1
 
-	print("ok")
+		os.system("sudo docker run --volume=/home/al3919/Projects/Msc-Individual-Project/backend/scripts/download:/apks alexmyg/andropytool -s /apks/ -vt " + API_KEY + " -fw")
+		print("ok")
+
+	except:
+		print("Unexpected error:", sys.exc_info()[0])
+
 	return 0
 
 def getURLFromDatabase(packageName):
