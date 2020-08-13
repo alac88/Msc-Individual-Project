@@ -72,7 +72,6 @@ app.get('/compareApps', (req, res) => {
   const pythonAnalysis = spawn('python3', [runAnalysisPath, req.query.apps]);
 
   pythonAnalysis.stdout.on('data', function(data) {
-      console.log('pythonAnalysis: ', data);
       res.write(data);
       res.end();
   });

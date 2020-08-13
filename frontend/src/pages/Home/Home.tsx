@@ -63,6 +63,7 @@ function Home(props: any) {
     function compareApps(apps: Array<AppProps>){
         fetch(`http://${databaseUrl}:3001/compareApps?apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
         .then(response => {
+            console.log(response.text());
             return response.text();
         })
         .then(() => {
@@ -85,7 +86,7 @@ function Home(props: any) {
             return response.json();
         })
         .then(data => {
-            // console.log("VTanalysis data: ", data);
+            console.log("VTanalysis data: ", data);
             setVTanalysis(data);
         });
     }
@@ -96,7 +97,7 @@ function Home(props: any) {
             return response.json();
         })
         .then(data => {
-            // console.log("Flowdroid data: ", data);
+            console.log("Flowdroid data: ", data);
             setFlowdroidAnalysis(data);
         });
     }
