@@ -14,7 +14,8 @@ interface AppProps{
     RATINGS: number
 }
 
-const databaseUrl ="localhost";
+// const databaseUrl ="localhost";
+const databaseUrl ="146.169.42.43";
 
 function Statistics(props: any) {
 

@@ -9,7 +9,8 @@ import ComparisonModal from '../../modals/ComparisonModal';
 import LoaderModal from '../../modals/LoaderModal';
 import './Home.scss';
 
-const databaseUrl = "localhost";
+// const databaseUrl = "localhost";
+const databaseUrl = "146.169.42.43";
 
 interface AppProps{
     ID: number, 
@@ -73,7 +74,7 @@ function Home(props: any) {
             setShowComparisonModal(true);
         })
         .catch((err) => {
-            setShowLoader(false);
+            closeModal();
             console.log(err);
         });
     }
