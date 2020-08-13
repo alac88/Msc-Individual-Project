@@ -34,16 +34,6 @@ app.get('/', (req, res) => {
   })
 })
 
-// app.get('/app', (req, res) => {
-//   database.getAppByPackageName(req.query.packageName)
-//   .then(response => {
-//     res.status(200).send(response);
-//   })
-//   .catch(error => {
-//     res.status(500).send(error);
-//   })
-// })
-
 app.get('/categories', (req, res) => {
   database.getCategories()
   .then(response => {
@@ -61,8 +51,8 @@ app.get('/VTanalysis', (req, res) => {
         return console.log('Unable to scan directory: ' + err);
     } 
     files.forEach(function (file) {
-      console.log(file);
-      console.log(JSON.parse(fs.readFileSync(VTDirectoryPath + file).toString()));
+      console.log('file: ', file);
+      console.log('file content: ', JSON.parse(fs.readFileSync(VTDirectoryPath + file).toString()));
       list.push({ "name": file, "content": JSON.parse(fs.readFileSync(VTDirectoryPath + file).toString())});
     });
     res.send(list);
@@ -82,7 +72,7 @@ app.get('/compareApps', (req, res) => {
   const pythonAnalysis = spawn('python3', [runAnalysisPath, req.query.apps]);
 
   pythonAnalysis.stdout.on('data', function(data) {
-      console.log(data);
+      console.log('pythonAnalysis: ', data);
       res.write(data);
       res.end();
   });
