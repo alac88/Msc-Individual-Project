@@ -1,12 +1,11 @@
 import React from 'react';
 import './VirusTotalAnalysis.scss';
 
-
 function VirusTotalAnalysis(props: any){
 
-    function getVirusTotalSecurityScore(){
-        return 1 - (props.appsChecked.positives / props.appsChecked.total);
-    }
+    // function getVirusTotalSecurityScore(app: any){
+    //     return 1 - (app.positives / app.total);
+    // }
 
     return (
         <div>
@@ -15,25 +14,22 @@ function VirusTotalAnalysis(props: any){
                 <thead>
                     <tr>
                         <th scope="col">App Name</th>
-                        <th scope="col">Security Score</th>
-                        {/* {Object.keys(props.appsChecked[0].VIRUS_TOTAL.scans).map((key) => {
-                            return <th>{key}</th>;
-                        })} */}
+                        {/* <th scope="col">Security Score</th> */}
+                        {props.analysis && Object.keys(props.analysis[0].content.scans).map((key) => {
+                            return <th key={key}>{key}</th>;
+                        })}
                     </tr>
                     </thead>
                     <tbody>
-                        {props.appsChecked.map((app: any) => {
+                        {props.analysis && props.analysis.map((app: any) => {
                             return (
-                                <tr key={app+"-tr"}>
-                                    <th className="name">{app.NAME_APP}</th>
-                                    {app.VIRUS_TOTAL ?
-                                        <>
-                                        <th className="securityScore">{getVirusTotalSecurityScore()}</th>
-                                        {Object.keys(app.VIRUS_TOTAL.scans).map((key) => {
-                                            return <th>{app.VIRUS_TOTAL.scans[key].detected}</th>;
+                                <tr key={app.content.sha1}>
+                                    <>
+                                        <th>{app.name.replace(".json", "")}</th>
+                                        {Object.keys(app.content.scans).map((key) => {
+                                            return <th key={key+"-result"}>{app.content.scans[key].detected ? "X" : ""}</th>;
                                         })}
-                                        </>
-                                    : <th>Analysis not available</th>}
+                                    </>
                                 </tr>
                             );
                         })}

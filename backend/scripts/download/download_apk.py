@@ -8,10 +8,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-def main(url):
-    packageName = sys.argv[1]
-    print("url is: ", url)
-    # url = sys.argv[2]
+def main():
+    # packageName = sys.argv[1]
+    url = sys.argv[1]
+
+    # print("download_apk.py entered with url: ", url)
 
     options = webdriver.ChromeOptions()
     options.add_argument('--headless')
@@ -34,11 +35,11 @@ def main(url):
 
     # driver.implicitly_wait(5)
 
-    # initialPath = "/Users/alexandrelac/Documents/Projects/Individual/Msc-Individual-Project/backend/scripts"
+    # initialPath = "/Users/alexandrelac/Documents/Projects/Individual/Msc-Individual-Project/backend/scripts/download/"
 
     # filename = max([initialPath + f for f in os.listdir(initialPath) if (f.find(".apk") + f.find(".xapk")) >= 0], key=os.path.getctime)
     
-    # filePath = '../../backend/scripts/download' + filename
+    # filePath = initialPath + filename
 
     # change path
         # VirusTotal Analysis

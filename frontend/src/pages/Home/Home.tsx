@@ -41,7 +41,7 @@ function Home(props: any) {
 
     const [VTanalysis, setVTanalysis] = useState();
 
-    const [flowDroidnalysis, setFlowdroidAnalysis] = useState();
+    const [flowdroidAnalysis, setFlowdroidAnalysis] = useState();
 
     const query = new URLSearchParams(props.location.search);
     
@@ -51,54 +51,78 @@ function Home(props: any) {
 
     function getApps() {
         fetch(`http://${databaseUrl}:3001?name=${query.get('name') || ''}&category=${encodeURIComponent(query.get('category') || '')}&Max=${query.get('Max') || '0'}`)
-            .then(response => {
-                return response.json();
-            })
-            .then(data => {
-                setApps(data);
-            });
-        }
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            setApps(data);
+        });
+    }
         
     function compareApps(apps: Array<AppProps>){
         fetch(`http://${databaseUrl}:3001/compareApps?apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
-            .then(response => {
-                return response.text();
-            })
-            .then(data => {
-                console.log('compareApps data: ', data);
-                setShowLoader(false);
-                console.log("Loader false");
-                // getAppsVirusTotalAnalysis(checkedApps);
-                // getAppsFlowdroidAnalysis(checkedApps);
-                setShowComparisonModal(true);
-                // setApps(data);
-            });
-        }
+        .then(response => {
+            return response.text();
+        })
+        .then(() => {
+            getVirusTotalAnalysis();
+            getFlowdroidAnalysis();
+        })
+        .then(() => {
+            setShowLoader(false);
+            setShowComparisonModal(true);
+        })
+        .catch((err) => {
+            setShowLoader(false);
+            console.log(err);
+        });
+    }
 
-        function getAppsVirusTotalAnalysis(apps: Array<AppProps>){
-            fetch(`http://${databaseUrl}:3001/VTanalysis?apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
-                .then(response => {
-                    return response.text();
-                })
-                .then(data => {
-                        console.log('VTanalysis data: ', data);
-                        // setVTanalysis(data);
-                    });
-        }
+    function getVirusTotalAnalysis() {
+        fetch(`http://${databaseUrl}:3001/VTanalysis`)
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            // console.log("VTanalysis data: ", data);
+            setVTanalysis(data);
+        });
+    }
 
-        function getAppsFlowdroidAnalysis(apps: Array<AppProps>){
-            fetch(`http://${databaseUrl}:3001/flowdroidAnalysis?apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
-                .then(response => {
-                    return response.text();
-                })
-                .then(data => {
-                        console.log('flowdroidAnalysis data: ', data);
-                        // setFlowdroidAnalysis(data);
-                    });
-        }
+    function getFlowdroidAnalysis() {
+        fetch(`http://${databaseUrl}:3001/flowdroidAnalysis`)
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            // console.log("Flowdroid data: ", data);
+            setFlowdroidAnalysis(data);
+        });
+    }
+
+    //     function getAppsVirusTotalAnalysis(apps: Array<AppProps>){
+    //         fetch(`http://${databaseUrl}:3001/VTanalysis?apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
+    //         .then(response => {
+    //             return response.text();
+    //         })
+    //         .then(data => {
+    //                 console.log('VTanalysis data: ', data);
+    //                 // setVTanalysis(data);
+    //             });
+    // }
+
+    //     function getAppsFlowdroidAnalysis(apps: Array<AppProps>){
+    //         fetch(`http://${databaseUrl}:3001/flowdroidAnalysis?apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
+    //         .then(response => {
+    //             return response.text();
+    //         })
+    //         .then(data => {
+    //                 console.log('flowdroidAnalysis data: ', data);
+    //                 // setFlowdroidAnalysis(data);
+    //             });
+    //     }
 
     function openComparisonModal(){
-        console.log("Loader true: ", checkedApps);
         document.getElementById("overlay")?.classList.add('active');
         setShowLoader(true);
         compareApps(checkedApps);
@@ -185,8 +209,8 @@ function Home(props: any) {
                 {appsList.map((app) => (
                     <div key={app.ID} className="row">
                         <input id={app.PACKAGE_NAME} onChange={() => checkApp(app.PACKAGE_NAME)} name="checkbox" type="checkbox" checked={isChecked(app)}/>
-                        <Card id={app.ID} name={app.NAME_APP} packageName={app.PACKAGE_NAME} version={app.VERSION_APP} category={app.CATEGORY} price={app.PRICE} ratings={app.RATINGS} ></Card>
-                        {/* <Card select={() => openAppModal(app.PACKAGE_NAME)} key={app.ID} id={app.ID} name={app.NAME_APP} packageName={app.PACKAGE_NAME} version={app.VERSION_APP} category={app.CATEGORY} price={app.PRICE} ratings={app.RATINGS} ></Card> */}
+                        {/* <Card id={app.ID} name={app.NAME_APP} packageName={app.PACKAGE_NAME} version={app.VERSION_APP} category={app.CATEGORY} price={app.PRICE} ratings={app.RATINGS} ></Card> */}
+                        <Card select={() => checkApp(app.PACKAGE_NAME)} key={app.ID} id={app.ID} name={app.NAME_APP} packageName={app.PACKAGE_NAME} version={app.VERSION_APP} category={app.CATEGORY} price={app.PRICE} ratings={app.RATINGS} ></Card>
                     </div>
                 ))}
             </div>
@@ -208,6 +232,8 @@ function Home(props: any) {
                 {showComparisonModal && <ComparisonModal
                     appsChecked={checkedApps}
                     show={showComparisonModal}
+                    VTanalysis={VTanalysis}
+                    flowdroidAnalysis={flowdroidAnalysis}
                     onHide={() => closeModal(true)}
                     />}
                 <div className="appContainer">

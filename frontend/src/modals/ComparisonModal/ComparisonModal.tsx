@@ -79,8 +79,8 @@ function ComparisonModal(props: any) {
 
                 <div className="analysis">
                     <h2>Analysis</h2>
-                    <VirusTotalAnalysis appsChecked={props.appsChecked} />
-                    <FlowdroidAnalysis appsChecked={props.appsChecked} />
+                    <VirusTotalAnalysis analysis={props.VTanalysis}/>
+                    <FlowdroidAnalysis analysis={props.flowdroidAnalysis}/>
                 </div>
             </Modal.Body>
 

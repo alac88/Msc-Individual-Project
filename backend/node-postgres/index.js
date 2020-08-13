@@ -1,3 +1,11 @@
+const path = require('path');
+const fs = require('fs');
+const csv = require("csvtojson/v2");
+const VTDirectoryPath = path.join(__dirname, '/home/al3919/Projects/Msc-Individual-Project/backend/scripts/download/VT_analysis');
+const flowdroidDirectoryPath = path.join(__dirname, '/home/al3919/Projects/Msc-Individual-Project/backend/scripts/download/FlowDroid_processed');
+// const VTDirectoryPath = path.join(__dirname, '../scripts/download/VT_analysis/');
+// const flowdroidPath = path.join(__dirname, '../scripts/download/FlowDroid_processed/flowdroid_global.csv');
+
 const express = require('express')
 const app = express()
 const port = 3001
@@ -48,32 +56,32 @@ app.get('/categories', (req, res) => {
 })
 
 app.get('/VTanalysis', (req, res) => {
-  database.getCategories()
-  .then(response => {
-    res.status(200).send(response);
-  })
-  .catch(error => {
-    res.status(500).send(error);
+  fs.readdir(VTDirectoryPath, function (err, files) {
+    list = []
+    if (err) {
+        return console.log('Unable to scan directory: ' + err);
+    } 
+    files.forEach(function (file) {
+      list.push({ "name": file, "content": JSON.parse(fs.readFileSync(VTDirectoryPath + file).toString())});
+    });
+    res.send(list);
+    res.end();
+  });
+})
+
+app.get('/flowdroidAnalysis', (req, res) => {
+  csv().fromFile(flowdroidPath).then((json) => {
+    res.send(json);
+    res.end();
   })
 })
 
-// app.get('/flowdroidAnalysis', (req, res) => {
-//   database.getCategories()
-//   .then(response => {
-//     res.status(200).send(response);
-//   })
-//   .catch(error => {
-//     res.status(500).send(error);
-//   })
-// })
-
 app.get('/compareApps', (req, res) => {
-
   const { spawn } = require('child_process');
-  const pythonAnalysis = spawn('python', ['/Users/alexandrelac/Documents/Projects/Individual/Msc-Individual-Project/backend/scripts/run_analysis.py', req.query.apps]);
+  // const pythonAnalysis = spawn('python3', ['/Users/alexandrelac/Documents/Projects/Individual/Msc-Individual-Project/backend/scripts/run_analysis.py', req.query.apps]);
+  const pythonAnalysis = spawn('python3', ['/home/al3919/Projects/Msc-Individual-Project/backend/scripts/run_analysis.py', req.query.apps]);
 
   pythonAnalysis.stdout.on('data', function(data) {
-      // console.log(data.toString());
       res.write(data);
       res.end();
   });

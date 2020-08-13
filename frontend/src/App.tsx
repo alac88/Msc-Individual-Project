@@ -1,6 +1,4 @@
 import React from 'react';
-import { ConnectedRouter } from 'connected-react-router';
-import { History } from 'history';
 import { Route } from 'react-router';
 import { BrowserRouter as Router } from "react-router-dom";
 

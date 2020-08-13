@@ -19,7 +19,7 @@ const databaseUrl ="localhost";
 function Statistics(props: any) {
 
     const [appsList, setApps] = useState(Array<AppProps>());
-    const [categoriesList, setCategoriesList] = useState(Array());
+    const [categoriesList, setCategoriesList] = useState([]);
 
     useEffect(() => {
         getApps();
