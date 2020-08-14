@@ -1,17 +1,9 @@
-.analysisListContainer {
-    height: fill-available;
-    width: fill-available;
-    outline: none;
+.analysisListContainer{
+    align-self: center;
 
-    h5{
-        margin: 0;
-        padding: 0 10px;
-    }
-
-    #analysisList{
-        padding: 10px 10px 0 10px;
-        width: fill-available;
-        border:none;
-        outline: none;
+    input{
+        text-align: center;
+        margin-right: 15px;
+        border-radius: 12px;
     }
 }

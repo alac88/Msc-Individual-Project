@@ -3,7 +3,7 @@ import React from 'react';
 import './SearchBar.scss'
 import Counter from '../Counter';
 import CategoryList from '../CategoryList';
-import AnalysisList from '../AnalysisList';
+import RatingsList from '../RatingsList';
 
 function SearchBar(){
     
@@ -17,8 +17,8 @@ function SearchBar(){
                 <div className="categoryContainer">
                     <CategoryList />
                 </div>
-                <div className="analysisContainer">
-                    <AnalysisList />
+                <div className="ratingsContainer">
+                    <RatingsList />
                 </div>
                 <div className="numberContainer">
                     <div className="max">
@@ -26,7 +26,6 @@ function SearchBar(){
                     </div>
                 </div>
                 <div className="button danger">
-                    {/* <button><FormattedMessage id="home.search" /></button> */}
                         <input type="submit" name="validate" defaultValue="Search" className="danger"/>
                 </div>
             </div>

@@ -2,14 +2,14 @@ import React, {
     useState,
     useEffect
 } from 'react';
+import AnalysisList from '../../components/AnalysisList';
+import Block from '../../components/Block';
 import Card from '../../components/Card';
 import SearchBar from '../../components/SearchBar';
-import Block from '../../components/Block';
 import ComparisonModal from '../../modals/ComparisonModal';
-import LoaderModal from '../../modals/LoaderModal';
+import Loader from "react-loader-spinner";
 import './Home.scss';
 
-// const databaseUrl = "localhost";
 const databaseUrl = "146.169.42.43";
 
 interface AppProps{
@@ -31,18 +31,16 @@ interface AppProps{
 function Home(props: any) {
 
     const [appsList, setApps] = useState(Array<AppProps>());
-    
-    const [appSelected, setAppSelected] = useState<AppProps>();
-    
+        
     const [checkedApps, setCheckedApps] = useState(Array<AppProps>());
 
     const [showComparisonModal, setShowComparisonModal] = useState(false);
 
     const [showLoader, setShowLoader] = useState(false);
 
-    const [VTanalysis, setVTanalysis] = useState();
+    const [VTanalysis, setVTanalysis] = useState(Array<any>());
 
-    const [flowdroidAnalysis, setFlowdroidAnalysis] = useState();
+    const [flowdroidAnalysis, setFlowdroidAnalysis] = useState(Array<any>());
 
     const query = new URLSearchParams(props.location.search);
     
@@ -51,7 +49,7 @@ function Home(props: any) {
     }, []);
 
     function getApps() {
-        fetch(`http://${databaseUrl}:3001?name=${query.get('name') || ''}&category=${encodeURIComponent(query.get('category') || '')}&Max=${query.get('Max') || '0'}`)
+        fetch(`http://${databaseUrl}:3001?name=${query.get('name') || ''}&category=${encodeURIComponent(query.get('category') || '')}&rating=${query.get('rating') || '0'}&Max=${query.get('Max') || '0'}`)
         .then(response => {
             return response.json();
         })
@@ -59,41 +57,71 @@ function Home(props: any) {
             setApps(data);
         });
     }
-        
-    function compareApps(apps: Array<AppProps>){
-        fetch(`http://${databaseUrl}:3001/compareApps?apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
+    
+    function cleanAnalysis(){
+        fetch(`http://${databaseUrl}:3001/clean`)
         .then(response => {
-            console.log(response.text());
             return response.text();
         })
-        .then(() => {
-            getVirusTotalAnalysis();
-            getFlowdroidAnalysis();
+    }
+
+    function startPolling(){
+        fetch(`http://${databaseUrl}:3001/startPolling`)
+        .then(response => {
+            return response.text();
         })
-        .then(() => {
-            setShowLoader(false);
-            setShowComparisonModal(true);
+    }
+
+    function stopPolling(){
+        fetch(`http://${databaseUrl}:3001/stopPolling`)
+        .then(response => {
+            return response.text();
+        })
+    }
+    
+    function compareApps(apps: Array<AppProps>){
+        startPolling();
+        fetchApps(apps);
+    }
+    
+    
+    function fetchApps(apps: Array<AppProps>, runScript = true){
+        fetch(`http://${databaseUrl}:3001/compareApps?runScript=${runScript}&apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
+        .then(response => {
+            return response.text();
+        })
+        .then((data) => {
+            if (data == "true"){
+                console.log("still here");
+                getVirusTotalAnalysis();
+                getFlowdroidAnalysis();
+                setTimeout(() => fetchApps(apps, false), 5000);
+            } else {
+                console.log("bye");
+                setShowLoader(false);
+            }
         })
         .catch((err) => {
             closeModal();
             console.log(err);
         });
     }
-
+   
+    
     function getVirusTotalAnalysis() {
         fetch(`http://${databaseUrl}:3001/VTanalysis`)
         .then(response => {
             return response.json();
         })
         .then(data => {
-            console.log("VTanalysis data: ", data);
             setVTanalysis(data);
         });
     }
-
+    
     function getFlowdroidAnalysis() {
         fetch(`http://${databaseUrl}:3001/flowdroidAnalysis`)
         .then(response => {
+            console.log(response);
             return response.json();
         })
         .then(data => {
@@ -102,37 +130,19 @@ function Home(props: any) {
         });
     }
 
-    //     function getAppsVirusTotalAnalysis(apps: Array<AppProps>){
-    //         fetch(`http://${databaseUrl}:3001/VTanalysis?apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
-    //         .then(response => {
-    //             return response.text();
-    //         })
-    //         .then(data => {
-    //                 console.log('VTanalysis data: ', data);
-    //                 // setVTanalysis(data);
-    //             });
-    // }
-
-    //     function getAppsFlowdroidAnalysis(apps: Array<AppProps>){
-    //         fetch(`http://${databaseUrl}:3001/flowdroidAnalysis?apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
-    //         .then(response => {
-    //             return response.text();
-    //         })
-    //         .then(data => {
-    //                 console.log('flowdroidAnalysis data: ', data);
-    //                 // setFlowdroidAnalysis(data);
-    //             });
-    //     }
-
     function openComparisonModal(){
+        document.body.style.overflow = 'hidden';
         document.getElementById("overlay")?.classList.add('active');
         setShowLoader(true);
+        setShowComparisonModal(true);
         compareApps(checkedApps);
     }
 
     function closeModal(isComparisonModal=false){
+        stopPolling();
         if (isComparisonModal){
             setShowComparisonModal(false);
+            cleanAnalysis();
         } else {
             setShowLoader(false);
         }
@@ -227,12 +237,9 @@ function Home(props: any) {
                     <Block type="statistics"  url="/statistics"></Block>
                     <Block type="git"  url="https://github.com/alac88/Msc-Individual-Project"></Block>
                 </div>
-                {showLoader && <LoaderModal 
-                    show={showLoader} 
-                    onCancel={() => closeModal()}
-                    />}
                 {showComparisonModal && <ComparisonModal
                     appsChecked={checkedApps}
+                    loader={showLoader}
                     show={showComparisonModal}
                     VTanalysis={VTanalysis}
                     flowdroidAnalysis={flowdroidAnalysis}
@@ -242,14 +249,11 @@ function Home(props: any) {
                     <div className="topBar">
                         <div className="appNumber">{appsList.length} apps found</div>
                         <div>
-                            <div className="button">
-                                {/* <input type="submit" name="compare" value="Compare" className="danger" disabled={ getCheckedApps().length >= 2 ? false : true }/> */}
-                                <input type="submit" name="compare" value={checkedApps.length == 1 ? "Analyse" : (checkedApps.length > 1 ? "Compare" : "Select apps")} className="danger" onClick={() => openComparisonModal() } disabled={ checkedApps.length >= 1 ? false : true }/>
-                            </div>
+                            <AnalysisList listLength={checkedApps.length} select={() => openComparisonModal()}/>
                             <div className="estimation">Estimated time: {checkedApps.length * 5} min (~5min/app)</div>
                         </div>
                     </div>
-                    {renderApps()}
+                    {appsList ? renderApps() : <Loader type="TailSpin" color="#E31C5F" height={100} width={100}/>}
                 </div>
             </div>
         );

@@ -13,9 +13,9 @@ function isNormalInteger(str) {
   return n !== Infinity && String(n) === str && n > 0;
 }
 
-function getAllApps(){
+function getAllApps(rating){
   return new Promise(function(resolve, reject) {
-    pool.query(`SELECT * FROM ${TABLE} ORDER BY "ID" ASC`, (error, results) => {
+    pool.query(`SELECT * FROM ${TABLE} WHERE "RATINGS">${rating} ORDER BY "ID" ASC`, (error, results) => {
       if (error) {
         console.log("Erreur: ", error);
         reject(error)
@@ -25,10 +25,10 @@ function getAllApps(){
   }) 
 }
 
-function getAppsByName(name, max){
+function getAppsByName(name, rating, max){
   if (max && isNormalInteger(max)){
     return new Promise(function(resolve, reject) {
-      pool.query(`SELECT * FROM ${TABLE} WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
+      pool.query(`SELECT * FROM ${TABLE} WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') AND "RATINGS">${rating} ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
         if (error) {
           console.log("Erreur: ", error);
           reject(error)
@@ -38,7 +38,7 @@ function getAppsByName(name, max){
     }) 
   } else {
     return new Promise(function(resolve, reject) {
-      pool.query(`SELECT * FROM ${TABLE} WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') ORDER BY "ID" ASC`, (error, results) => {
+      pool.query(`SELECT * FROM ${TABLE} WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') AND "RATINGS">${rating} ORDER BY "ID" ASC`, (error, results) => {
         if (error) {
           console.log("Erreur: ", error);
           reject(error)
@@ -49,10 +49,10 @@ function getAppsByName(name, max){
   }
 }
 
-function getAppsByCategory(category, max){
+function getAppsByCategory(category, rating, max){
   if (max && isNormalInteger(max)){
     return new Promise(function(resolve, reject) {
-      pool.query(`SELECT * FROM ${TABLE} WHERE "CATEGORY"='${category}' ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
+      pool.query(`SELECT * FROM ${TABLE} WHERE "CATEGORY"='${category}' AND "RATINGS">${rating}ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
         if (error) {
           console.log("Erreur: ", error);
           reject(error)
@@ -62,7 +62,7 @@ function getAppsByCategory(category, max){
     }) 
   } else {
     return new Promise(function(resolve, reject) {
-      pool.query(`SELECT * FROM ${TABLE} WHERE "CATEGORY"='${category}' ORDER BY "ID" ASC`, (error, results) => {
+      pool.query(`SELECT * FROM ${TABLE} WHERE "CATEGORY"='${category}' AND "RATINGS">${rating} ORDER BY "ID" ASC`, (error, results) => {
         if (error) {
           console.log("Erreur: ", error);
           reject(error)
@@ -73,9 +73,9 @@ function getAppsByCategory(category, max){
   }
 }
 
-function getSomeApps(max){
+function getSomeApps(rating, max){
   return new Promise(function(resolve, reject) {
-    pool.query(`SELECT * FROM ${TABLE} ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
+    pool.query(`SELECT * FROM ${TABLE} WHERE "RATINGS">${rating} ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
       if (error) {
         console.log("Erreur: ", error);
         reject(error)
@@ -85,10 +85,10 @@ function getSomeApps(max){
   }) 
 }
 
-function getAppsByNameAndCategory(name, category, max){
+function getAppsByNameAndCategory(name, category, rating, max){
   if (max && isNormalInteger(max)){
     return new Promise(function(resolve, reject) {
-      pool.query(`SELECT * FROM ${TABLE} WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') AND "CATEGORY"='${category}' ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
+      pool.query(`SELECT * FROM ${TABLE} WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') AND "CATEGORY"='${category}' AND "RATINGS">${rating} ORDER BY "ID" ASC LIMIT ${max}`, (error, results) => {
         if (error) {
           console.log("Erreur: ", error);
           reject(error)
@@ -98,7 +98,7 @@ function getAppsByNameAndCategory(name, category, max){
     }) 
   } else {
     return new Promise(function(resolve, reject) {
-      pool.query(`SELECT * FROM ${TABLE} WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') AND "CATEGORY"='${category}' ORDER BY "ID" ASC`, (error, results) => {
+      pool.query(`SELECT * FROM ${TABLE} WHERE ("NAME_APP" LIKE '%${name}%' OR "PACKAGE_NAME" LIKE '%${name}%') AND "CATEGORY"='${category}' AND "RATINGS">${rating} ORDER BY "ID" ASC`, (error, results) => {
         if (error) {
           console.log("Erreur: ", error);
           reject(error)
@@ -108,34 +108,34 @@ function getAppsByNameAndCategory(name, category, max){
     }) 
   }
 }
-const getApps = (name, category, max) => {
+const getApps = (name, category, rating, max) => {
 
   if ((name != null) && (category != null) && (name != '') && (category != '')) {
-    return getAppsByNameAndCategory(name, category, max);
+    return getAppsByNameAndCategory(name, category, rating, max);
   } else if ((name != null) && (name != '')) {
-    return getAppsByName(name, max);
+    return getAppsByName(name, rating, max);
   } else if ((category != null) && (category != '')) {
-    return getAppsByCategory(category, max);
+    return getAppsByCategory(category, rating, max);
   } else if (max && isNormalInteger(max)) {
-    return getSomeApps(max);
+    return getSomeApps(rating, max);
   } else {
-    return getAllApps();
+    return getAllApps(rating);
   }
 }
 
-const getAppByPackageName = (packageName) => {
-  return new Promise(function(resolve, reject) {
-    pool.query(`SELECT * FROM ${TABLE} WHERE "PACKAGE_NAME"='${packageName}'`, (error, results) => {
-      if (error) {
-        console.log("Erreur: ", error);
-        reject(error)
-      }
-      resolve(results.rows);
-    })
-  }) 
-}
+// const getAppByPackageName = (packageName, rating) => {
+//   return new Promise(function(resolve, reject) {
+//     pool.query(`SELECT * FROM ${TABLE} WHERE "PACKAGE_NAME"='${packageName}' AND "RATINGS">${rating}`, (error, results) => {
+//       if (error) {
+//         console.log("Erreur: ", error);
+//         reject(error)
+//       }
+//       resolve(results.rows);
+//     })
+//   }) 
+// }
 
-const getCategories = (categoryName) => {
+const getCategories = () => {
   return new Promise(function(resolve, reject) {
     pool.query(`SELECT "CATEGORY", COUNT(*) FROM ${TABLE} WHERE "CATEGORY" IN (SELECT DISTINCT "CATEGORY" FROM ${TABLE}) GROUP BY "CATEGORY";`, (error, results) => {
       if (error) {
@@ -149,6 +149,6 @@ const getCategories = (categoryName) => {
 
 module.exports = {
   getApps,
-  getAppByPackageName,
+  // getAppByPackageName,
   getCategories,
 }

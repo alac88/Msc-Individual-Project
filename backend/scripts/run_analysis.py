@@ -1,5 +1,7 @@
 import sys
 import os
+import time
+import subprocess
 import psycopg2
 
 HOST = "localhost"
@@ -7,33 +9,29 @@ USER = "postgres"
 PASSWORD = "testdb"
 DATABASE = "imperial"
 PORT = "5432"
-TABLE = "public.test4"
+TABLE = "project"
 
 API_KEY = 'a01255f309c75b3642163d9a522f1b761a8e7f9327b656031e2b874156336c04'
-DOWNLOAD_PATH = os.path.dirname(os.path.abspath(__file__)) + "/download/download_apk.py "
+DOWNLOAD_PATH = os.path.dirname(os.path.abspath(__file__)) + "/download/download_apk.py"
 
 
 def main():
-
-	virusTotalAnalysis = []
-	flowdroidAnalysis = []
+	
 
 	appsList = sys.argv[1].split(",")
-	# print(appsList)
 	i = 0
 
 	try: 
 		while i < len(appsList):
-			# print(appsList[i])
 			url = getURLFromDatabase(appsList[i])
-			# print(url)
-			# os.system("python3 /home/al3919/Projects/Msc-Individual-Project/backend/scripts/download/download_apk.py " + url)
-			print(DOWNLOAD_PATH)
-			os.system("python3 " + DOWNLOAD_PATH + url)
+
+			p = subprocess.Popen(["python3", DOWNLOAD_PATH, url])
+			p.wait()
 			i += 1
 
-		os.system("sudo docker run --volume=/home/al3919/Projects/Msc-Individual-Project/backend/scripts/download:/apks alexmyg/andropytool -s /apks/ -vt " + API_KEY + " -fw")
-		print("ok")
+		q = subprocess.Popen(["sudo", "docker", "run", "--volume=/home/al3919/Projects/Msc-Individual-Project/backend/scripts/download:/apks", "alexmyg/andropytool", "-s", "/apks/", "-vt", API_KEY, "-fw"])
+		q.wait()
+		print("END")
 
 	except:
 		print("Unexpected error:", sys.exc_info()[0])

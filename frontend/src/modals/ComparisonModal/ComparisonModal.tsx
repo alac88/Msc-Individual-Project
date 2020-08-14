@@ -1,6 +1,7 @@
 import React from "react";
 import Modal from "react-bootstrap/Modal";
 import "./ComparisonModal.scss";
+import Loader from "react-loader-spinner";
 import VirusTotalAnalysis from "../../analysis/VirusTotalAnalysis";
 import FlowdroidAnalysis from "../../analysis/FlowdroidAnalysis";
 
@@ -44,6 +45,15 @@ function ComparisonModal(props: any) {
     //     return securityScore / count;
     // }
 
+    function getSecurityScoreTable(){
+        return (
+            <tr>
+                <th>Test</th>
+                <th>0</th>
+            </tr>
+        );
+    }
+
     return (
         <div id="modal">
         <Modal
@@ -53,7 +63,8 @@ function ComparisonModal(props: any) {
             dialogClassName={"comparisonModal"}
         >
             <Modal.Header>
-            <Modal.Title>Comparison Analysis</Modal.Title>
+                <Modal.Title>Comparison Analysis</Modal.Title>
+                {props.loader && <Loader type="TailSpin" color="#E31C5F" height={40} width={40}/>}
             </Modal.Header>
 
             <Modal.Body>
@@ -76,25 +87,35 @@ function ComparisonModal(props: any) {
                 </>
 
                 }
+                <div className="securityScore analysis">
+                    <h2>Security Score Summary</h2>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th scope="col">App Name</th>
+                            <th scope="col">Security Score</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {getSecurityScoreTable()}
+                        </tbody>
+                    </table>
+
+                </div>
 
                 <div className="analysis">
-                    <h2>Analysis</h2>
+                    <h2>Detailed Analysis</h2>
                     <VirusTotalAnalysis analysis={props.VTanalysis}/>
                     <FlowdroidAnalysis analysis={props.flowdroidAnalysis}/>
                 </div>
             </Modal.Body>
 
             <Modal.Footer>
-                {(props.appsChecked.length > 1) &&
-                <div className="button">
-                    <input type="submit" name="download" value="Download (.xlsx)" className="success" />
-                </div>
-                }
                 <div className="button">
                     <input
                     type="submit"
-                    name="close"
-                    value="Close"
+                    name="clear"
+                    value="Clear"
                     className="danger"
                     onClick={props.onHide}
                     />

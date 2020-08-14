@@ -1,27 +1,31 @@
+
 import React, { useState } from 'react';
 import './AnalysisList.scss'
 
-interface Props {
-
-}
-
-function AnalysisList(props: Props){
+function AnalysisList(props: any){
 
     const [analysisList, setAnalysisList] = useState([
-        "Mobile Squatting",
-        "Permission requests"
-        ]);
+        "Pre-static",
+        "Static",
+        "Both"]);
 
     
     return (
         <div className="analysisListContainer">
-            <h5>Type of Analysis</h5>
-            <input placeholder="What kind of analysis?" list="analysis" name="analysisList" id="analysisList"/>
-                <datalist id="analysis">
-                    {analysisList.map((analysis) => {
-                        return <option key={analysis} value={analysis}/>
-                    })}
-                </datalist> 
+            {/* <form className="comparisonForm"> */}
+                {/* <input placeholder="Type of Analysis" list="analysisList" name="analysis" id="analysis"/>
+                    <datalist id="analysisList">
+                        {analysisList.map((analysis) => {
+                            return <option key={analysis} value={analysis}/>
+                        })}
+                    </datalist>  */}
+
+                <div className="button">
+                    <input type="submit" name="compare" value={props.listLength == 1 ? "Analyse" : (props.listLength > 1 ? "Compare" : "Select apps")} className="danger" onClick={props.select} disabled={ props.listLength >= 1 ? false : true }/>
+                </div>
+
+
+            {/* </form> */}
         </div>
     )
 

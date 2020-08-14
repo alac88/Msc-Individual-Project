@@ -4,6 +4,8 @@ import Loader from "react-loader-spinner";
 import "./LoaderModal.scss";
 
 function LoaderModal(props: any) {
+
+    
     const setOverlay = () => {
         document.getElementById("modal")?.classList.add("active");
     };
@@ -26,7 +28,8 @@ function LoaderModal(props: any) {
 
             <Modal.Body>
 
-                <Loader type="ThreeDots" color="#E31C5F" height={100} width={100}/>
+                <p>Loading ...</p><br/>
+                <Loader type="TailSpin" color="#E31C5F" height={100} width={100}/>
 
             </Modal.Body>
 
