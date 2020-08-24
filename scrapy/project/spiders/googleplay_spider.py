@@ -13,21 +13,14 @@ PASSWORD = "testdb"
 DATABASE = "imperial"
 PORT = "5432"
 
-# HOST = "localhost"
-# USER = "postgres"
-# PASSWORD = "testdb"
-# DATABASE = "imperial_db"
-# PORT = "5432"
-
 class GooglePlaySpider(CrawlSpider):
     name = "googleplay"
     allowed_domains = ["play.google.com"]
-    # start_urls = ['https://play.google.com/store/apps/']
-    start_urls = ['https://play.google.com/store/apps/details?id=com.weward&hl=en']
+    start_urls = ['https://play.google.com/store/apps/']
+    # start_urls = ['https://play.google.com/store/apps/details?id=com.weward&hl=en']
     rules = (
-        # Rule(LinkExtractor(allow=('/store/apps',))),
-        Rule(LinkExtractor(allow=('/store/apps/details?')), callback='parseUrl'),
-        # Rule(LinkExtractor(allow=('/store/apps/details?')), follow=True, callback='parseUrl'),
+        # Rule(LinkExtractor(allow=('/store/apps/details?')), callback='parseUrl'),
+        Rule(LinkExtractor(allow=('/store/apps/details?')), follow=True, callback='parseUrl'),
         )
 
     def parseName(self, name):
