@@ -5,6 +5,7 @@ import urllib.parse as urlparse
 from urllib.parse import parse_qs
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
+from scrapy.http.request import Request
 from project.items import GooglePlayItem
 
 HOST = "localhost"
@@ -15,11 +16,9 @@ PORT = "5432"
 
 class GooglePlaySpider(CrawlSpider):
     name = "googleplay"
-    allowed_domains = ["play.google.com"]
+    allowed_domains = ["play.google.com", "apkpure.com"]
     start_urls = ['https://play.google.com/store/apps/']
-    # start_urls = ['https://play.google.com/store/apps/details?id=com.weward&hl=en']
     rules = (
-        # Rule(LinkExtractor(allow=('/store/apps/details?')), callback='parseUrl'),
         Rule(LinkExtractor(allow=('/store/apps/details?')), follow=True, callback='parseUrl'),
         )
 
@@ -61,17 +60,24 @@ class GooglePlaySpider(CrawlSpider):
             # item["Link"] = response.xpath('').extract()
             item["APK_URL"] = "https://apkpure.com/" + self.parseName(item["Name"][0]) + "/" + item["PackageName"] + "/download?from=details"
 
-
-            if not isInDatabase:
-                self.addInDatabase(item)
-                asyncio.run(self.analyseApp(item["PackageName"], item["APK_URL"]))
-            elif isInDatabase and not isLatestVersion:
-                self.updateInDatabase(item)
-                asyncio.run(self.analyseApp(item["PackageName"], item["APK_URL"]))
+            yield Request(item["APK_URL"], callback=self.checkAPKStatus, priority=1, meta={"item":item, "isInDatabase": isInDatabase, "isLatestVersion": isLatestVersion})
 
         yield item
 
+    def checkAPKStatus(self, response):
 
+        item = response.meta['item']
+        isInDatabase = response.meta['isInDatabase']
+        isLatestVersion = response.meta['isLatestVersion']
+
+        item["APK_URL_STATUS"] = response.status
+
+        if not isInDatabase:
+            self.addInDatabase(item)
+        elif isInDatabase and not isLatestVersion:
+            self.updateInDatabase(item)
+        
+        return item
 
     def isUpToDate(self, packageName, version):
 
@@ -106,15 +112,13 @@ class GooglePlaySpider(CrawlSpider):
     def addInDatabase(self, item):
 
         conn = psycopg2.connect("host=%s dbname=%s user=%s password=%s port=%s" % (HOST, DATABASE, USER, PASSWORD, PORT))
-        # print("Database opened successfully")
 
         cur = conn.cursor()
 
-        sql = "INSERT INTO project(\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") VALUES ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s')" % (item["PackageName"], item["Name"][0].replace("'", " ").replace('"', ' '), item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", " ")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(" Buy", "").replace("€", "")), item["APK_URL"])
+        sql = "INSERT INTO project(\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\", \"APK_URL_STATUS\") VALUES ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s', %d)" % (item["PackageName"], item["Name"][0].replace("'", " ").replace('"', ' '), item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", " ")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(" Buy", "").replace("€", "")), item["APK_URL"], item["APK_URL_STATUS"])
         cur.execute(sql)
 
         conn.commit()
-        # print("Record inserted successfully")
         conn.close()
 
         return True
@@ -122,66 +126,13 @@ class GooglePlaySpider(CrawlSpider):
     def updateInDatabase(self, item):
 
         conn = psycopg2.connect("host=%s dbname=%s user=%s password=%s port=%s" % (HOST, DATABASE, USER, PASSWORD, PORT))
-        # print("Database opened successfully")
 
         cur = conn.cursor()
 
-        sql = "UPDATE project SET (\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\") = ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s')" % (item["PackageName"], item["Name"][0].replace("'", " ").replace('"', ' '), item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(",", ".")), item["APK_URL"])
+        sql = "UPDATE project SET (\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\", \"APK_URL_STATUS\") = ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s', %d)" % (item["PackageName"], item["Name"][0].replace("'", " ").replace('"', ' '), item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(",", ".")), item["APK_URL"], item["APK_URL_STATUS"])
         cur.execute(sql)
 
         conn.commit()
-        # print("Record updated successfully")
         conn.close()
 
         return True
-
-    async def analyseApp(self, packageName, url):
-        proc = await asyncio.create_subprocess_exec("python3", "../../backend/scripts/download_apk.py", packageName, url)
-        await proc.wait()
-
-
-# # # -- Table: public.test1
-
-# # # -- DROP TABLE public.test1;
-
-# # # CREATE TABLE public.test1
-# # # (
-# # #     "ID" integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
-# # #     "PACKAGE_NAME" text COLLATE pg_catalog."default",
-# # #     "NAME_APP" text COLLATE pg_catalog."default",
-# # #     "UPDATED" date,
-# # #     "PACKAGE_NAME" text COLLATE pg_catalog."default",
-# # #     "INSTALLS" integer,
-# # #     "VERSION_APP" text COLLATE pg_catalog."default",
-# # #     "ANDROID_MIN_VERSION" text COLLATE pg_catalog."default",
-# # #     "OFFERED_BY" text COLLATE pg_catalog."default",
-# # #     "RATINGS" double precision,
-# # #     "RATINGS_NUMBER" double precision,
-# # #     "CATEGORY" text COLLATE pg_catalog."default",
-# # #     "PRICE" double precision,
-# # #     CONSTRAINT test1_pkey PRIMARY KEY ("ID")
-# # # )
-
-# # # TABLESPACE pg_default;
-
-# # # ALTER TABLE public.test1
-# # #     OWNER to postgres;
-
-# CREATE TABLE IF NOT EXISTS "projectDB" (
-# 	"ID" serial,
-# 	"PACKAGE_NAME" text,
-# 	"NAME_APP" text,
-# 	"UPDATED" date,
-# 	"SIZE_APP" text,
-# 	"INSTALLS" text,
-# 	"VERSION_APP" text,
-# 	"ANDROID_MIN_VERSION" text,
-# 	"OFFERED_BY" text,
-# 	"RATINGS" numeric(9,2),
-# 	"RATINGS_NUMBER" text,
-# 	"CATEGORY" text,
-# 	"PRICE" numeric(9,2),
-# 	"APK_URL" text,
-# 	"VIRUS_TOTAL" jsonb,
-# 	PRIMARY KEY( "ID" )
-# );
