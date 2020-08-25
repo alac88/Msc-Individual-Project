@@ -1,30 +1,28 @@
-import React from "react";
+import React, {
+    useState
+} from 'react';
 import Modal from "react-bootstrap/Modal";
 import "./ComparisonModal.scss";
 import Loader from "react-loader-spinner";
 import VirusTotalAnalysis from "../../analysis/VirusTotalAnalysis";
 import FlowdroidAnalysis from "../../analysis/FlowdroidAnalysis";
+import PermissionsAnalysis from "../../analysis/PermissionsAnalysis";
 
-// interface AppProps{
-//     ID: number, 
-//     NAME_APP: string, 
-//     PACKAGE_NAME: string, 
-//     VERSION_APP: string, 
-//     CATEGORY: string, 
-//     PRICE: number, 
-//     RATINGS: number,
-//     OFFERED_BY: string,
-//     ANDROID_MIN_VERSION: string, 
-//     INSTALLS: number,
-//     UPDATED: Date,
-//     SIZE_APP: string,
-//     TEST1: number,
-//     TEST2: number,
-//     TEST3: number,
-//     SECURITY_SCORE: number
-// }
+interface Props{
+    show: any,
+    loader: boolean,
+    // checkedApps: Array<JSON>,
+    // VTanalysis: Array<JSON>,
+    // flowdroidAnalysis: Array<JSON>
+    onHide: any
+}
 
 function ComparisonModal(props: any) {
+
+    const [permissionsSecurityScoreList, setPermissionsSecurityScoreList] = useState(Array<any>());
+    const [VTSecurityScoreList, setVTSecurityScoreList] = useState(Array<any>());
+    const [flowdroidSecurityScoreList, setFlowdroidSecurityScoreList] = useState(Array<any>());
+    
     const setOverlay = () => {
         document.getElementById("modal")?.classList.add("active");
     };
@@ -33,26 +31,65 @@ function ComparisonModal(props: any) {
         document.getElementById("modal")?.classList.remove("modal");
     };
 
-    // function getSecurityScore(app: any){
-    //     var securityScore = 0;
-    //     var count = 0;
-    //     Object.keys(app.VIRUS_TOTAL.stats).map((cat) => {
-    //         count += app.VIRUS_TOTAL.stats[cat];
-    //         if ((cat == "malicious") || (cat == "suspicious") ){
-    //             securityScore += app.VIRUS_TOTAL.stats[cat];
-    //         }
-    //     })
-    //     return securityScore / count;
+    // const getPermissionsSecurityScoreList = (scoreList: any) => {
+    //     console.log("Permissions security scoreList: ", scoreList);
+    //     setPermissionsSecurityScoreList(scoreList);
     // }
 
-    function getSecurityScoreTable(){
-        return (
-            <tr>
-                <th>Test</th>
-                <th>0</th>
-            </tr>
-        );
+    // const getVTSecurityScoreList = (scoreList: any) => {
+    //     console.log("VirusTotal security scoreList: ", scoreList);
+    //     setVTSecurityScoreList(scoreList);
+    // }
+    
+    // const getFlowdroidSecurityScoreList = (scoreList: any) => {
+    //     console.log("FlowDroid security scoreList: ", scoreList);
+    //     setFlowdroidSecurityScoreList(scoreList);
+    // }
+
+    function getSecurityScoreClass(score: number){
+        if ((0 <= score) && (score < 0.25)){
+            return "critical";
+        } else if ((0.25 <= score) && (score < 0.5)){
+            return "danger";
+        } else if ((0.5 <= score) && (score < 0.75)){
+            return "medium"
+        } else if ((0.75 <= score) && (score <= 1)){
+            return "success";
+        } else {
+            return "unknown";
+        }
     }
+
+    function getSecurityScoreTotal(permissionsSecurityScore: number, VTSecurityScore: number, flowdroidSecurityScore: number){
+        return (permissionsSecurityScore + VTSecurityScore + flowdroidSecurityScore) / 3;
+    }
+
+    function getSecurityScoreTable(){
+        // console.log("permissionsSecurityScoreList: ", permissionsSecurityScoreList);
+        // console.log("VTSecurityScoreList: ", VTSecurityScoreList);
+        // console.log("flowdroidSecurityScoreList: ", flowdroidSecurityScoreList);
+        if ((permissionsSecurityScoreList.length == VTSecurityScoreList.length) && (VTSecurityScoreList.length == flowdroidSecurityScoreList.length)){
+                return (
+                    <>
+                        {permissionsSecurityScoreList.map((app, index) => {
+                            return (
+                                <tr>
+                                    <th>{app.name}</th>
+                                    <th className={getSecurityScoreClass(app.score)}>{app.score}</th>
+                                    <th className={getSecurityScoreClass(VTSecurityScoreList[index].score)}>{VTSecurityScoreList[index].score}</th>
+                                    <th className={getSecurityScoreClass(flowdroidSecurityScoreList[index].score)}>{flowdroidSecurityScoreList[index].score}</th>
+                                    <th className={"total " + getSecurityScoreClass(getSecurityScoreTotal(app.score, VTSecurityScoreList[index].score, flowdroidSecurityScoreList[index].score))}>{getSecurityScoreTotal(permissionsSecurityScoreList[index].score, VTSecurityScoreList[index].score, flowdroidSecurityScoreList[index].score)}</th>
+                                </tr>
+                            )
+                            
+                        })}
+
+                    </>
+                )
+                    
+        }
+    }
+
 
     return (
         <div id="modal">
@@ -69,44 +106,49 @@ function ComparisonModal(props: any) {
 
             <Modal.Body>
 
-                {(props.appsChecked.length == 1) &&
+                {(props.checkedApps.length == 1) &&
                     <>
                     <h2>Information</h2>
-                    <div className="row"><b>ID: </b>{props.appsChecked[0].ID}</div>
-                    <div className="row"><b>App Name: </b>{props.appsChecked[0].NAME_APP}</div>
-                    <div className="row"><b>Package Name: </b>{props.appsChecked[0].PACKAGE_NAME}</div>
-                    <div className="row"><b>Size: </b>{props.appsChecked[0].SIZE_APP}</div>
-                    <div className="row"><b>Last Update: </b>{props.appsChecked[0].UPDATED}</div>
-                    <div className="row"><b>App Version: </b>{props.appsChecked[0].VERSION_APP}</div>
-                    <div className="row"><b>Android Minimum Version: </b>{props.appsChecked[0].ANDROID_MIN_VERSION}</div>
-                    <div className="row"><b>Installs: </b>{props.appsChecked[0].INSTALLS}</div>
-                    <div className="row"><b>Category: </b>{props.appsChecked[0].CATEGORY}</div>
-                    <div className="row"><b>Price: </b>{props.appsChecked[0].PRICE}</div>
-                    <div className="row"><b>Ratings: </b>{props.appsChecked[0].RATINGS}</div>
-                    <div className="row"><b>Offered By: </b>{props.appsChecked[0].OFFERED_BY}</div>
+                    <div className="row"><b>ID: </b>{props.checkedApps[0].ID}</div>
+                    <div className="row"><b>App Name: </b>{props.checkedApps[0].NAME_APP}</div>
+                    <div className="row"><b>Package Name: </b>{props.checkedApps[0].PACKAGE_NAME}</div>
+                    <div className="row"><b>Size: </b>{props.checkedApps[0].SIZE_APP}</div>
+                    <div className="row"><b>Last Update: </b>{props.checkedApps[0].UPDATED}</div>
+                    <div className="row"><b>App Version: </b>{props.checkedApps[0].VERSION_APP}</div>
+                    <div className="row"><b>Android Minimum Version: </b>{props.checkedApps[0].ANDROID_MIN_VERSION}</div>
+                    <div className="row"><b>Installs: </b>{props.checkedApps[0].INSTALLS}</div>
+                    <div className="row"><b>Category: </b>{props.checkedApps[0].CATEGORY}</div>
+                    <div className="row"><b>Price: </b>{props.checkedApps[0].PRICE}</div>
+                    <div className="row"><b>Ratings: </b>{props.checkedApps[0].RATINGS}</div>
+                    <div className="row"><b>Offered By: </b>{props.checkedApps[0].OFFERED_BY}</div>
                 </>
 
                 }
-                <div className="securityScore analysis">
-                    <h2>Security Score Summary</h2>
-                    <table>
-                        <thead>
-                        <tr>
-                            <th scope="col">App Name</th>
-                            <th scope="col">Security Score</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                            {getSecurityScoreTable()}
-                        </tbody>
-                    </table>
-
-                </div>
+                {props.loader ? 
+                    <div className="securityScore analysis">
+                        <h2>Security Score Summary</h2>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>App/Scores</th>
+                                <th>Permissions</th>
+                                <th>Pre-static</th>
+                                <th>Static</th>
+                                <th>Total</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {getSecurityScoreTable()}
+                            </tbody>
+                        </table>
+                    </div>
+                    : null}
 
                 <div className="analysis">
                     <h2>Detailed Analysis</h2>
-                    <VirusTotalAnalysis analysis={props.VTanalysis}/>
-                    <FlowdroidAnalysis analysis={props.flowdroidAnalysis}/>
+                    {props.permissions && <PermissionsAnalysis analysis={props.permissions} callback={(scoreList: any) => setPermissionsSecurityScoreList(scoreList)}/>}
+                    {props.VTanalysis && <VirusTotalAnalysis analysis={props.VTanalysis} callback={(scoreList: any) => setVTSecurityScoreList(scoreList)}/>}
+                    {props.flowdroidAnalysis && <FlowdroidAnalysis analysis={props.flowdroidAnalysis} callback={(scoreList: any) => setFlowdroidSecurityScoreList(scoreList)}/>}
                 </div>
             </Modal.Body>
 

@@ -1,4 +1,19 @@
-// .comparisonModal{
-//     height: 75%;
-//     width: 75%;
-// }
+.securityScore{
+    table th{
+        &.critical{
+            background-color: red;
+        }
+        &.danger{
+            background-color: orange;
+        }
+        &.medium{
+            background-color: yellow;
+        }
+        &.success{
+            background-color: green;
+        }
+        &.total{
+            font-weight: bold !important;
+        }
+    }
+}
