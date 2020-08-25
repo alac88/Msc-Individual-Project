@@ -25,11 +25,11 @@ function Card(props: Props){
                     {props.id}
                 </div>
 
-                <div className="info"> 
+                <div className="info large"> 
                     {props.name}
                 </div>
 
-                <div className="info"> 
+                <div className="info large"> 
                     {props.packageName}
                 </div>
 

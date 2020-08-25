@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import './RatingsList.scss'
 
-interface Props {
-
-}
-
-function RatingsList(props: Props){
+function RatingsList(){
 
     const [min, setMin] = useState(0);
     

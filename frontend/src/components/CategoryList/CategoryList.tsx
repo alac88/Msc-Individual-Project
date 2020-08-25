@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import './CategoryList.scss'
 
-interface Props {
-
-}
-
-function CategoryList(props: Props){
+function CategoryList(){
 
     const [categoryList, setCategoryList] = useState([
         "Art & Design",

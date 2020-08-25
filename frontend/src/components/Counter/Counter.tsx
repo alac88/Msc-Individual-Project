@@ -1,21 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import './Counter.scss'
 
-interface Props {
-    name: string
-}
-
-function Counter(props: Props){
+function Counter(){
 
     const [count, setCount] = useState(0);
 
     return (
         <div className="counterContainer">
-            <div>{props.name}</div>
+            <div>Max</div>
             <div className="appsNumber">
                 <div className="counterButton" onClick={() => (count > 0) && setCount(count - 1)}><span>-</span></div>
-                {/* <input placeholder="All" name={props.name} id="count" className="counter" value={count}/> */}
-                <input placeholder="All" name={props.name} id="count" className="counter" defaultValue={count}/>
+                {/* <input placeholder="All" name="max" id="count" className="counter" value={count}/> */}
+                <input placeholder="All" name="max" id="count" className="counter" defaultValue={count}/>
                 <div className="counterButton" onClick={() => setCount(count + 1)}><span>+</span></div>
             </div>
         </div>

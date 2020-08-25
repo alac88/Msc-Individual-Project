@@ -2,6 +2,11 @@
 import React, { useState } from 'react';
 import './AnalysisList.scss'
 
+interface Props{
+    listLength: number,
+    select(): any
+}
+
 function AnalysisList(props: any){
 
     const [analysisList, setAnalysisList] = useState([
@@ -9,23 +14,24 @@ function AnalysisList(props: any){
         "Static",
         "Both"]);
 
+    const [type, setType] = useState<string>("Both");
     
     return (
         <div className="analysisListContainer">
-            {/* <form className="comparisonForm"> */}
-                {/* <input placeholder="Type of Analysis" list="analysisList" name="analysis" id="analysis"/>
-                    <datalist id="analysisList">
-                        {analysisList.map((analysis) => {
-                            return <option key={analysis} value={analysis}/>
-                        })}
-                    </datalist>  */}
 
-                <div className="button">
-                    <input type="submit" name="compare" value={props.listLength == 1 ? "Analyse" : (props.listLength > 1 ? "Compare" : "Select apps")} className="danger" onClick={props.select} disabled={ props.listLength >= 1 ? false : true }/>
-                </div>
+                <select id="analysis" name="analysis" onChange={(e) => setType(e.target.value)}>
+                    {analysisList.map((analysis) => {
+                        if (analysis == "Both"){
+                            return <option key={analysis} value={analysis} selected>{analysis}</option>
+                        }
+                        return <option key={analysis} value={analysis}>{analysis}</option>
+                    })}
+                </select>
 
+            <div className="button">
+                <input type="submit" name="compare" value={props.listLength == 1 ? "Analyse" : (props.listLength > 1 ? "Compare" : "Select apps")} className="danger" onClick={() => props.select(type)} disabled={props.listLength >= 1 ? false : true} />
+            </div>
 
-            {/* </form> */}
         </div>
     )
 

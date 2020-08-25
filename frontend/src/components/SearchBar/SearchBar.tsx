@@ -22,7 +22,7 @@ function SearchBar(){
                 </div>
                 <div className="numberContainer">
                     <div className="max">
-                        <Counter name="Max"/>
+                        <Counter />
                     </div>
                 </div>
                 <div className="button danger">
