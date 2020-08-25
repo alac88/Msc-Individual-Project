@@ -17,7 +17,7 @@ interface AppProps{
 // const databaseUrl ="localhost";
 const databaseUrl ="146.169.42.43";
 
-function Statistics(props: any) {
+function Statistics() {
 
     const [appsList, setApps] = useState(Array<AppProps>());
     const [categoriesList, setCategoriesList] = useState([]);

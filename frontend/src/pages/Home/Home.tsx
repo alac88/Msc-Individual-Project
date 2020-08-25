@@ -9,6 +9,7 @@ import SearchBar from '../../components/SearchBar';
 import ComparisonModal from '../../modals/ComparisonModal';
 import Loader from "react-loader-spinner";
 import './Home.scss';
+import { Link } from 'react-router-dom';
 
 const databaseUrl = "146.169.42.43";
 
@@ -31,33 +32,55 @@ interface AppProps{
 function Home(props: any) {
 
     const [appsList, setApps] = useState(Array<AppProps>());
+
+    const [appsCount, setAppsCount] = React.useState<number>();
         
     const [checkedApps, setCheckedApps] = useState(Array<AppProps>());
 
     const [showComparisonModal, setShowComparisonModal] = useState(false);
 
-    const [showLoader, setShowLoader] = useState(false);
+    const [showComparisonLoader, setShowComparisonLoader] = useState(false);
+    
+    const [showLoader, setShowLoader] = useState(true);
 
     const [VTanalysis, setVTanalysis] = useState(Array<any>());
 
     const [flowdroidAnalysis, setFlowdroidAnalysis] = useState(Array<any>());
+    
+    const [permissions, setPermissions] = useState(Array<any>());
+
+    const [pageNumber, setPageNumber] = React.useState<number>(
+        props.match.params.page ? parseInt(props.match.params.page, 10) : 0,
+      );
 
     const query = new URLSearchParams(props.location.search);
     
     useEffect(() => {
         getApps();
-    }, []);
+        getAppsCount();
+    }, [pageNumber]);
 
     function getApps() {
-        fetch(`http://${databaseUrl}:3001?name=${query.get('name') || ''}&category=${encodeURIComponent(query.get('category') || '')}&rating=${query.get('rating') || '0'}&Max=${query.get('Max') || '0'}`)
+        fetch(`http://${databaseUrl}:3001?page=${pageNumber}&name=${query.get('name') || ''}&category=${encodeURIComponent(query.get('category') || '')}&rating=${query.get('rating') || '0'}&max=${query.get('max') || '0'}`)
         .then(response => {
             return response.json();
         })
         .then(data => {
             setApps(data);
+            setShowLoader(false);
         });
     }
     
+    function getAppsCount(){
+        fetch(`http://${databaseUrl}:3001/appsCount`)
+        .then(response => {
+            return response.text();
+        })
+        .then(data => {
+            setAppsCount(parseInt(data));
+        })
+    }
+
     function cleanAnalysis(){
         fetch(`http://${databaseUrl}:3001/clean`)
         .then(response => {
@@ -79,31 +102,55 @@ function Home(props: any) {
         })
     }
     
-    function compareApps(apps: Array<AppProps>){
+    function compareApps(apps: Array<AppProps>, type: string){
         startPolling();
-        fetchApps(apps);
+        fetchApps(apps, type);
     }
     
     
-    function fetchApps(apps: Array<AppProps>, runScript = true){
-        fetch(`http://${databaseUrl}:3001/compareApps?runScript=${runScript}&apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
+    function fetchApps(apps: Array<AppProps>, type: string, runScript = false){
+        fetch(`http://${databaseUrl}:3001/compareApps?type=${type}&runScript=${runScript}&apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
         .then(response => {
             return response.text();
         })
         .then((data) => {
             if (data == "true"){
-                console.log("still here");
-                getVirusTotalAnalysis();
-                getFlowdroidAnalysis();
-                setTimeout(() => fetchApps(apps, false), 5000);
+                switch(type){
+                    case "Pre-static":
+                        getPermissions();
+                        getVirusTotalAnalysis();
+                        break;
+                    case "Static":
+                        getPermissions();
+                        getFlowdroidAnalysis();
+                        break;
+                    case "Both":
+                        getPermissions();
+                        getVirusTotalAnalysis();
+                        getFlowdroidAnalysis();
+                        break;
+                    default:
+                        break;
+                }
+                setTimeout(() => fetchApps(apps, type, false), 5000);
             } else {
                 console.log("bye");
-                setShowLoader(false);
+                setShowComparisonLoader(false);
             }
         })
         .catch((err) => {
             closeModal();
             console.log(err);
+        });
+    }
+
+    function getPermissions(){
+        fetch(`http://${databaseUrl}:3001/permissions`)
+        .then(response => {
+            return response.json();
+        })
+        .then(data => {
+            setPermissions(data);
         });
     }
    
@@ -121,21 +168,19 @@ function Home(props: any) {
     function getFlowdroidAnalysis() {
         fetch(`http://${databaseUrl}:3001/flowdroidAnalysis`)
         .then(response => {
-            console.log(response);
             return response.json();
         })
         .then(data => {
-            console.log("Flowdroid data: ", data);
             setFlowdroidAnalysis(data);
         });
     }
 
-    function openComparisonModal(){
+    function openComparisonModal(type: string){
         document.body.style.overflow = 'hidden';
         document.getElementById("overlay")?.classList.add('active');
-        setShowLoader(true);
+        setShowComparisonLoader(true);
         setShowComparisonModal(true);
-        compareApps(checkedApps);
+        compareApps(checkedApps, type);
     }
 
     function closeModal(isComparisonModal=false){
@@ -144,7 +189,7 @@ function Home(props: any) {
             setShowComparisonModal(false);
             cleanAnalysis();
         } else {
-            setShowLoader(false);
+            setShowComparisonLoader(false);
         }
         document.getElementById("overlay")?.classList.remove('active');
     }
@@ -203,6 +248,11 @@ function Home(props: any) {
         return false;
     }
 
+    function switchPage(newPageNumber: number) {
+        setPageNumber(newPageNumber);
+        setShowLoader(true);
+      }
+
     function renderApps(){
         return (
             <div className="bottomBar">
@@ -210,12 +260,12 @@ function Home(props: any) {
                         <input id="all" type="checkbox" onChange={() => checkAll()}/>
                         <div className="headings">
                             <span className="id">ID</span>
-                            <span>App Name</span>
-                            <span>Package Name</span>
-                            <span>Version</span>
-                            <span>Category</span>
-                            <span>Price</span>
-                            <span>Ratings</span>
+                            <span className="info large">App Name</span>
+                            <span className="info large">Package Name</span>
+                            <span className="info">Version</span>
+                            <span className="info">Category</span>
+                            <span className="info">Price</span>
+                            <span className="info">Ratings</span>
                         </div>
                 </div>
                 {appsList.map((app) => (
@@ -233,27 +283,33 @@ function Home(props: any) {
             <div className="container">
                 <SearchBar />
                 <div className="infoContainer">
-                    <Block type="info"  url=""></Block>
+                    <Block type="info"  url="/readme"></Block>
                     <Block type="statistics"  url="/statistics"></Block>
                     <Block type="git"  url="https://github.com/alac88/Msc-Individual-Project"></Block>
                 </div>
                 {showComparisonModal && <ComparisonModal
-                    appsChecked={checkedApps}
-                    loader={showLoader}
+                    checkedApps={checkedApps}
+                    loader={showComparisonLoader}
                     show={showComparisonModal}
                     VTanalysis={VTanalysis}
                     flowdroidAnalysis={flowdroidAnalysis}
+                    permissions={permissions}
                     onHide={() => closeModal(true)}
                     />}
                 <div className="appContainer">
                     <div className="topBar">
-                        <div className="appNumber">{appsList.length} apps found</div>
+                        <div className="appsCount">Crawler has found a total of <span style={{fontWeight:'bold'}}>{appsCount}</span> apps</div>
                         <div>
-                            <AnalysisList listLength={checkedApps.length} select={() => openComparisonModal()}/>
+                            <AnalysisList listLength={checkedApps.length} select={(type: string) => openComparisonModal(type)}/>
                             <div className="estimation">Estimated time: {checkedApps.length * 5} min (~5min/app)</div>
                         </div>
                     </div>
-                    {appsList ? renderApps() : <Loader type="TailSpin" color="#E31C5F" height={100} width={100}/>}
+                    { showLoader ? <div className="loaderContainer"><Loader type="TailSpin" color="#E31C5F" height={100} width={100}/></div> : appsList ? renderApps() : null }
+                </div>
+                <div className="navPageContainer">
+                    <Link to={`/${pageNumber - 1}`} onClick={() => switchPage(pageNumber - 1)} style={{ visibility: pageNumber >= 1 ? 'visible' : 'hidden' }}>Previous</Link>
+                    <Link to={`/${pageNumber + 1}`} onClick={() => switchPage(pageNumber + 1)}>Next</Link>
+
                 </div>
             </div>
         );

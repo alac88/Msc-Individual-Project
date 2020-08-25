@@ -13,7 +13,7 @@
         flex-direction: row;
         align-items: center;
 
-        .appNumber{
+        .appsCount{
             flex:1;
         }
 
@@ -31,6 +31,10 @@
         }
     }
 
+    .loaderContainer{
+        text-align: center;
+    }
+
     .bottomBar{
         .row{
             display: flex;
@@ -46,18 +50,32 @@
                 margin: 10px;
                 color: #222222;
 
+                .id{
+                    flex: 3 !important;
+                    font-weight: bold;
+                }
+                
                 span{
-                    flex: 5;
+                    flex: 4;
                     overflow: hidden;
                     align-self: center;
                     padding-left: 5px;
                     padding-right: 10px;
+                    &.large{
+                        flex:10 !important;
+                    }
                 }
 
             }
 
         }
     }
+
+}
+.navPageContainer{
+    padding: 15px;
+    justify-content: space-between;
+    display: flex;
 }
 
 .modal{
