@@ -2,6 +2,11 @@ frontend/node_modules/*
 backend/node-postgres/node_modules/*
 .DS_Store
 backend/.DS_Store
-scrapy/project/__pycache__/items.cpython-37.pyc
-scrapy/project/__pycache__/settings.cpython-37.pyc
-scrapy/project/spiders/__pycache__/googleplay_spider.cpython-37.pyc
+scrapy/project/__pycache__/*
+scrapy/project/spiders/__pycache__/*
+backend/scripts/download/FlowDroid_outputs/
+backend/scripts/download/FlowDroid_processed/
+backend/scripts/download/Permissions/
+backend/scripts/download/VT_analysis/
+backend/scripts/download/chromedriver
+backend/scripts/download/samples/
