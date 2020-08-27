@@ -61,7 +61,8 @@ function ComparisonModal(props: any) {
     }
 
     function getSecurityScoreTotal(permissionsSecurityScore: number, VTSecurityScore: number, flowdroidSecurityScore: number){
-        return Math.round(((permissionsSecurityScore + VTSecurityScore + flowdroidSecurityScore) / 3) * 100) / 100;
+       
+        return Math.round((1 - Math.sqrt((Math.pow(permissionsSecurityScore - 1, 2) + Math.pow(VTSecurityScore - 1, 2) + Math.pow(flowdroidSecurityScore - 1, 2)) / 3)) * 100) / 100;
     }
 
     function getSecurityScoreTable(){

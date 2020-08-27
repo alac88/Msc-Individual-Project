@@ -72,7 +72,7 @@ function PermissionsAnalysis(props: any){
                         nbDangerousPermissions++;
                     }
                 })
-                score = 1 / Math.exp(nbDangerousPermissions / 10);
+                score = Math.exp(-nbDangerousPermissions / 10);
                 scoreList.push({"name": props.analysis[i].name, "score": Math.round(score*10)/10});
                 i++;
             }

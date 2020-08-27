@@ -22,7 +22,7 @@ function Statistics() {
 
     const [appsList, setApps] = useState(Array<AppProps>());
     const [categoriesList, setCategoriesList] = useState(Array());
-    const [ratingsList, setRatingsList] = useState(Array<number>());
+    const [ratingsList, setRatingsList] = useState(Array());
 
     useEffect(() => {
         getApps();
@@ -103,9 +103,9 @@ function Statistics() {
                         </tr>
                     </thead>
                     <tbody>
-                        {categoriesList.map((cat) => {
+                        {categoriesList.map((cat, key) => {
                             return (
-                                <tr>
+                                <tr key={key}>
                                     <th>{cat.name}</th>
                                     <th>{cat.value}</th>
                                 </tr>
@@ -132,9 +132,9 @@ function Statistics() {
                         </tr>
                     </thead>
                     <tbody>
-                        {ratingsList.map((rating: any) => {
+                        {ratingsList.map((rating, key) => {
                             return (
-                                <tr>
+                                <tr key={key}>
                                     <th>{rating.name}</th>
                                     <th>{rating.value}</th>
                                 </tr>

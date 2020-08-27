@@ -307,8 +307,8 @@ function Home(props: any) {
                     { showLoader ? <div className="loaderContainer"><Loader type="TailSpin" color="#E31C5F" height={100} width={100}/></div> : appsList ? renderApps() : null }
                 </div>
                 <div className="navPageContainer">
-                    <Link to={`/${pageNumber - 1}`} onClick={() => switchPage(pageNumber - 1)} style={{ visibility: pageNumber >= 1 ? 'visible' : 'hidden' }}>Previous</Link>
-                    <Link to={`/${pageNumber + 1}`} onClick={() => switchPage(pageNumber + 1)}>Next</Link>
+                    <Link to={`/?name=${query.get('name')}&category=${query.get('category')}&rating=${query.get('rating')}&max=${query.get('max')}&page=${pageNumber - 1}`} onClick={() => switchPage(pageNumber - 1)} style={{ visibility: pageNumber >= 1 ? 'visible' : 'hidden' }}>Previous</Link>
+                    <Link to={`/?name=${query.get('name')}&category=${query.get('category')}&rating=${query.get('rating')}&max=${query.get('max')}&page=${pageNumber + 1}`} onClick={() => switchPage(pageNumber + 1)}>Next</Link>
 
                 </div>
             </div>

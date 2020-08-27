@@ -26,7 +26,7 @@ function SearchBar(){
                     </div>
                 </div>
                 <div className="button danger">
-                        <input type="submit" name="validate" defaultValue="Search" className="danger"/>
+                        <input type="submit" name="validate" value="Search" className="danger"/>
                 </div>
             </div>
 

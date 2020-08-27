@@ -24,7 +24,7 @@ function FlowdroidAnalysis(props: any){
                         }
                     })
                 })
-                score = 1 / Math.exp(nbSourcesSinks / 50);
+                score = Math.exp(-nbSourcesSinks / 50);
 
 
                 scoreList.push({"name": props.analysis[i].name, "score": Math.round(score*10)/10});

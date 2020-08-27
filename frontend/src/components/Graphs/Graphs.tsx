@@ -6,9 +6,7 @@ import {
 import './Graphs.scss'
 
 function Graphs(props : any){
-
-    console.log(props.data);
-
+    
     return (
         <div className="graphs">
             
