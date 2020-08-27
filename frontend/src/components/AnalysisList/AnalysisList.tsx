@@ -19,11 +19,8 @@ function AnalysisList(props: any){
     return (
         <div className="analysisListContainer">
 
-                <select id="analysis" name="analysis" onChange={(e) => setType(e.target.value)}>
+                <select id="analysis" name="analysis" onChange={(e) => setType(e.target.value)} value="Both">
                     {analysisList.map((analysis) => {
-                        if (analysis == "Both"){
-                            return <option key={analysis} value={analysis} selected>{analysis}</option>
-                        }
                         return <option key={analysis} value={analysis}>{analysis}</option>
                     })}
                 </select>
