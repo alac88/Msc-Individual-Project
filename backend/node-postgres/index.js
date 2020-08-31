@@ -64,7 +64,12 @@ app.get('/VTanalysis', (req, res) => {
         return console.log('Unable to scan directory: ' + err);
     } 
     files.forEach(function (file) {
-      listVT.push({ "name": file, "content": JSON.parse(fs.readFileSync(VTDirectoryPath + file).toString())});
+      try {
+        let jsonContent = JSON.parse(fs.readFileSync(VTDirectoryPath + file).toString());
+        listVT.push({ "name": file, "content": jsonContent});
+      } catch (e){
+        console.log("Error when opening", file, ":", e);
+      }
     });
     res.send(listVT);
     res.end();
@@ -122,23 +127,28 @@ app.get('/permissions', (req, res) => {
       var permissionsList = []
 
       if (stats.isDirectory()){
-        var lines = fs.readFileSync(permissionsDirectoryPath+dir+"/AndroidManifest.xml").toString().split("\n");
-        for (var i = 0; i < lines.length; i++){
-          var line = lines[i];
-          if (line.indexOf("<uses-permission") != -1) {
-            var permission = parseUsesPermission(line);
-            if (permission){
-              permissionsList.push(permission);
-            }
-          } else if (line.indexOf("<permission") != -1) {
-            var permission = parsePermission(line);
-            if (permission){
-              permissionsList.push(permission);
+        try {
+          var lines = fs.readFileSync(permissionsDirectoryPath+dir+"/AndroidManifest.xml").toString().split("\n");
+          for (var i = 0; i < lines.length; i++){
+            var line = lines[i];
+            if (line.indexOf("<uses-permission") != -1) {
+              var permission = parseUsesPermission(line);
+              if (permission){
+                permissionsList.push(permission);
+              }
+            } else if (line.indexOf("<permission") != -1) {
+              var permission = parsePermission(line);
+              if (permission){
+                permissionsList.push(permission);
+              }
             }
           }
-        }
+  
+          fullPermissionsList.push({ "name": dir, "content": permissionsList});
 
-        fullPermissionsList.push({ "name": dir, "content": permissionsList});
+        } catch (e){
+          console.log("Error when reading directory: ", e);
+        }
       }
       if (index == array.length - 1){
         res.send(fullPermissionsList);

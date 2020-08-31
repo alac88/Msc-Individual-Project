@@ -12,7 +12,7 @@ PORT = "5432"
 TABLE = "project"
 
 API_KEY = 'a01255f309c75b3642163d9a522f1b761a8e7f9327b656031e2b874156336c04'
-DOWNLOAD_PATH = os.path.dirname(os.path.abspath(__file__)) + "/download/"
+DOWNLOAD_PATH = os.path.dirname(os.path.abspath(__file__)) + "/download"
 SAMPLES_PATH = os.path.dirname(os.path.abspath(__file__)) + "/download/samples/"
 
 
@@ -28,25 +28,25 @@ def main():
 			url = getURLFromDatabase(appsList[i])
 
 			# Download APK
-			p = subprocess.Popen(["python3", DOWNLOAD_PATH + "download_apk.py", url])
+			p = subprocess.Popen(["python3", DOWNLOAD_PATH + "/download_apk.py", url])
 			p.wait()
 			i += 1
 
 		# AndroPyTool analysis
 		if typeAnalysis == "Pre-static":
-			q = subprocess.Popen(["sudo", "docker", "run", "--volume=/home/al3919/Projects/Msc-Individual-Project/backend/scripts/download:/apks", "alexmyg/andropytool", "-s", "/apks/", "-vt", API_KEY])
+			q = subprocess.Popen(["sudo", "docker", "run", "--volume=" + DOWNLOAD_PATH + ":/apks", "alexmyg/andropytool", "-s", "/apks/", "-vt", API_KEY])
 		
 		elif typeAnalysis == "Static":
-			q = subprocess.Popen(["sudo", "docker", "run", "--volume=/home/al3919/Projects/Msc-Individual-Project/backend/scripts/download:/apks", "alexmyg/andropytool", "-s", "/apks/", "-fw"])
+			q = subprocess.Popen(["sudo", "docker", "run", "--volume=" + DOWNLOAD_PATH + ":/apks", "alexmyg/andropytool", "-s", "/apks/", "-fw"])
 		
 		elif typeAnalysis == "Both":
-			q = subprocess.Popen(["sudo", "docker", "run", "--volume=/home/al3919/Projects/Msc-Individual-Project/backend/scripts/download:/apks", "alexmyg/andropytool", "-s", "/apks/", "-vt", API_KEY, "-fw"])
+			q = subprocess.Popen(["sudo", "docker", "run", "--volume=" + DOWNLOAD_PATH + ":/apks", "alexmyg/andropytool", "-s", "/apks/", "-vt", API_KEY, "-fw"])
 		
 		q.wait()
 
 		# Permissions analysis
 		for filename in os.listdir(SAMPLES_PATH):
-			r = subprocess.Popen(["apktool", "d", "-o", DOWNLOAD_PATH + "Permissions/" + filename, SAMPLES_PATH + filename])
+			r = subprocess.Popen(["apktool", "d", "-o", DOWNLOAD_PATH + "/Permissions/" + filename, SAMPLES_PATH + filename])
 			r.wait()
 
 		print("END")

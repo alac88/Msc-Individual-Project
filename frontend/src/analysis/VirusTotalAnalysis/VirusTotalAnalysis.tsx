@@ -27,7 +27,7 @@ function VirusTotalAnalysis(props: any){
             let scoreList = Array();
             let i = 0;
             while (props.analysis[i]){
-                let score = 1 - (props.analysis[i].content.positives / props.analysis[i].content.total);
+                let score = Math.pow(props.analysis[i].content.positives / props.analysis[i].content.total - 1, 2);
                 scoreList.push({"name": props.analysis[i].name.replace(".json", ""), "score": Math.round(score*10)/10});
                 i++;
             }
@@ -56,7 +56,7 @@ function VirusTotalAnalysis(props: any){
                                     <th>{app.name.replace(".json", "")}</th>
                                     {getKeysList().map((key) => {
                                         if (app.content.scans[key]){
-                                            return <th key={key+"-result"}>{app.content.scans[key].detected ? "X" : ""}</th>;
+                                            return <th key={key+"-result"}>{app.content.scans[key].detected ? app.content.scans[key].result : ""}</th>;
 
                                         } else {
                                             return <th key={key+"-result"}>NaN</th>

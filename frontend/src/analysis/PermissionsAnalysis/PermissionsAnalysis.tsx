@@ -37,7 +37,29 @@ const dangerousPermissions = [
     "WRITE_EXTERNAL_STORAGE",
 
     "SYSTEM_ALERT_WINDOW",
-    "WRITE_SETTINGS"
+    "WRITE_SETTINGS",
+
+    // Not for use by third-party applications
+    "ACCESS_CHECKIN_PROPERTIES",
+    "ACCOUNT_MANAGER",
+    "BIND_APPWIDGET",
+    "BLUETOOTH_PRIVILEGED",
+    "CALL_PRIVILEDGED",
+    "CAPTURE_AUDIO_OUTPUT",
+    "CONTROL_LOCATION_UPDATES",
+    "DELETE_PACKAGES",
+    "DUMP",
+    "INSTALL_LOCATION_PROVIDER",
+    "INSTALL_PACKAGES",
+    "LOCATION_HARDWARE",
+    "MEDIA_CONTENT_CONTROL",
+    "MODIFY_PHONE_STATE",
+    "MOUNT_FORMAT_FILESYSTEMS",
+    "MOUNT_UNMOUNT_FILESYSTEMS",
+    "READ_LOGS",
+    "REBOOT",
+    "SET_PROCESS_LIMIT",
+    "WRITE_SECURE_SETTINGS",
 ]
 
 function PermissionsAnalysis(props: any){
@@ -69,10 +91,12 @@ function PermissionsAnalysis(props: any){
                 let nbDangerousPermissions = 0;
                 props.analysis[i].content.map((permission: string) => {
                     if (dangerousPermissions.includes(permission) || permission.includes("/dangerous")){
+                        // console.log(permission);
                         nbDangerousPermissions++;
                     }
                 })
-                score = Math.exp(-nbDangerousPermissions / 10);
+                // console.log(props.analysis[i].name, nbDangerousPermissions);
+                score = Math.exp(-nbDangerousPermissions / 8);
                 scoreList.push({"name": props.analysis[i].name, "score": Math.round(score*10)/10});
                 i++;
             }

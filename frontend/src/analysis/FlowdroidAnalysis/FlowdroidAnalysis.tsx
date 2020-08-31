@@ -3,6 +3,65 @@ import React, {
 } from 'react';
 import './FlowdroidAnalysis.scss';
 
+// const sourcesSinks = [
+//     "SMS_MMS",
+//     "FILE_INFORMATION",	
+//     "UNIQUE_IDENTIFIER",	
+//     "FILE",	
+//     "BLUETOOTH",	
+//     "BLUETOOTH_INFORMATION",	
+//     "EMAIL",	
+//     "VOIP",	
+//     "NETWORK",	
+//     "IMAGE",	
+//     "DATABASE_INFORMATION",	
+//     "ACCOUNT_SETTINGS",	
+//     "VIDEO",	
+//     "PHONE_CONNECTION",	
+//     "CALENDAR_INFORMATION",	
+//     "WIDGET",	
+//     "NFC",	
+//     "LOCATION_INFORMATION",	
+//     "LOG",	
+//     "BUNDLE",	
+//     "BROWSER_INFORMATION",	
+//     "SYSTEM_SETTINGS",	
+//     "AUDIO",	
+//     "NOT_EXISTING",	
+//     "IPC",	
+//     "PHONE_STATE",	
+//     "ACCOUNT_INFORMATION",	
+//     "SYNCHRONIZATION_DATA",	
+//     "CONTACT_INFORMATION",	
+//     "NO_CATEGORY",	
+//     "NETWORK_INFORMATION"
+// ]
+
+const dangerousSourcesSinks = [
+    "SMS_MMS",
+    "FILE_INFORMATION",	
+    "UNIQUE_IDENTIFIER",	
+    "FILE",	
+    "BLUETOOTH",	
+    "BLUETOOTH_INFORMATION",	
+    "EMAIL",	
+    "VOIP",	
+    "NETWORK",	
+    "IMAGE",	
+    "ACCOUNT_SETTINGS",	
+    "VIDEO",	
+    "CALENDAR_INFORMATION",	
+    "LOCATION_INFORMATION",	
+    "LOG",	
+    "BROWSER_INFORMATION",	
+    "SYSTEM_SETTINGS",	
+    "AUDIO",	
+    "PHONE_STATE",	
+    "ACCOUNT_INFORMATION",	
+    "CONTACT_INFORMATION",	
+    "NETWORK_INFORMATION"
+]
+
 function FlowdroidAnalysis(props: any){
 
     useEffect(() => {
@@ -24,7 +83,7 @@ function FlowdroidAnalysis(props: any){
                         }
                     })
                 })
-                score = Math.exp(-nbSourcesSinks / 50);
+                score = Math.exp(-nbSourcesSinks / 8);
 
 
                 scoreList.push({"name": props.analysis[i].name, "score": Math.round(score*10)/10});

@@ -22,6 +22,10 @@ function ComparisonModal(props: any) {
     const [permissionsSecurityScoreList, setPermissionsSecurityScoreList] = useState(Array<any>());
     const [VTSecurityScoreList, setVTSecurityScoreList] = useState(Array<any>());
     const [flowdroidSecurityScoreList, setFlowdroidSecurityScoreList] = useState(Array<any>());
+
+    const permissionsWeight = 1;
+    const VTWeight =  5;
+    const flowdroidWeight = 3;
     
     const setOverlay = () => {
         document.getElementById("modal")?.classList.add("active");
@@ -30,21 +34,6 @@ function ComparisonModal(props: any) {
     const onExit = () => {
         document.getElementById("modal")?.classList.remove("modal");
     };
-
-    // const getPermissionsSecurityScoreList = (scoreList: any) => {
-    //     console.log("Permissions security scoreList: ", scoreList);
-    //     setPermissionsSecurityScoreList(scoreList);
-    // }
-
-    // const getVTSecurityScoreList = (scoreList: any) => {
-    //     console.log("VirusTotal security scoreList: ", scoreList);
-    //     setVTSecurityScoreList(scoreList);
-    // }
-    
-    // const getFlowdroidSecurityScoreList = (scoreList: any) => {
-    //     console.log("FlowDroid security scoreList: ", scoreList);
-    //     setFlowdroidSecurityScoreList(scoreList);
-    // }
 
     function getSecurityScoreClass(score: number){
         if ((0 <= score) && (score < 0.25)){
@@ -60,16 +49,31 @@ function ComparisonModal(props: any) {
         }
     }
 
-    function getSecurityScoreTotal(permissionsSecurityScore: number, VTSecurityScore: number, flowdroidSecurityScore: number){
-       
-        return Math.round((1 - Math.sqrt((Math.pow(permissionsSecurityScore - 1, 2) + Math.pow(VTSecurityScore - 1, 2) + Math.pow(flowdroidSecurityScore - 1, 2)) / 3)) * 100) / 100;
+    function getSecurityScoreTotal(index: number){
+        let permissionsSecurityScore =  permissionsSecurityScoreList[index].score;
+        if (props.type == "Pre-static"){
+            let VTSecurityScore = VTSecurityScoreList[index].score;
+            return Math.round((1 - Math.sqrt((permissionsWeight * Math.pow(permissionsSecurityScore - 1, 2) + VTWeight *Math.pow(VTSecurityScore - 1, 2)) / (permissionsWeight + VTWeight))) * 100) / 100;
+        } else if (props.type == "Static"){
+            let flowdroidSecurityScore = flowdroidSecurityScoreList[index].score;
+            return Math.round((1 - Math.sqrt((permissionsWeight * Math.pow(permissionsSecurityScore - 1, 2)  + VTWeight * Math.pow(flowdroidSecurityScore - 1, 2)) / (permissionsWeight + flowdroidWeight))) * 100) / 100;
+        } else {
+            let VTSecurityScore = VTSecurityScoreList[index].score;
+            let flowdroidSecurityScore = flowdroidSecurityScoreList[index].score;
+            return Math.round((1 - Math.sqrt((permissionsWeight * Math.pow(permissionsSecurityScore - 1, 2) + VTWeight * Math.pow(VTSecurityScore - 1, 2) + flowdroidWeight * Math.pow(flowdroidSecurityScore - 1, 2)) / (permissionsWeight + VTWeight + flowdroidWeight))) * 100) / 100;
+        }
     }
 
     function getSecurityScoreTable(){
+        // console.log("hello");
         // console.log("permissionsSecurityScoreList: ", permissionsSecurityScoreList);
         // console.log("VTSecurityScoreList: ", VTSecurityScoreList);
         // console.log("flowdroidSecurityScoreList: ", flowdroidSecurityScoreList);
-        if ((permissionsSecurityScoreList.length == VTSecurityScoreList.length) && (VTSecurityScoreList.length == flowdroidSecurityScoreList.length)){
+        if (
+            ((props.type == "Both") && ((permissionsSecurityScoreList.length == VTSecurityScoreList.length) && (permissionsSecurityScoreList.length == flowdroidSecurityScoreList.length))) ||
+            ((props.type == "Pre-static") && (permissionsSecurityScoreList.length == VTSecurityScoreList.length)) ||
+            ((props.type == "Static") && (permissionsSecurityScoreList.length == flowdroidSecurityScoreList.length))
+            ){
                 return (
                     <>
                         {permissionsSecurityScoreList.map((app, index) => {
@@ -77,9 +81,9 @@ function ComparisonModal(props: any) {
                                 <tr>
                                     <th>{app.name}</th>
                                     <th className={getSecurityScoreClass(app.score)}>{app.score}</th>
-                                    <th className={getSecurityScoreClass(VTSecurityScoreList[index].score)}>{VTSecurityScoreList[index].score}</th>
-                                    <th className={getSecurityScoreClass(flowdroidSecurityScoreList[index].score)}>{flowdroidSecurityScoreList[index].score}</th>
-                                    <th className={"total " + getSecurityScoreClass(getSecurityScoreTotal(app.score, VTSecurityScoreList[index].score, flowdroidSecurityScoreList[index].score))}>{getSecurityScoreTotal(permissionsSecurityScoreList[index].score, VTSecurityScoreList[index].score, flowdroidSecurityScoreList[index].score)}</th>
+                                    { ((props.type == "Both") || (props.type == "Pre-static")) && <th className={getSecurityScoreClass(VTSecurityScoreList[index].score)}>{VTSecurityScoreList[index].score}</th>}
+                                    {((props.type == "Both") || (props.type == "Static")) && <th className={getSecurityScoreClass(flowdroidSecurityScoreList[index].score)}>{flowdroidSecurityScoreList[index].score}</th>}
+                                    <th className={"total " + getSecurityScoreClass(getSecurityScoreTotal(index))}>{getSecurityScoreTotal(index)}</th>
                                 </tr>
                             )
                             
@@ -133,13 +137,14 @@ function ComparisonModal(props: any) {
                             <tr>
                                 <th>App/Scores</th>
                                 <th>Permissions</th>
-                                <th>Pre-static</th>
-                                <th>Static</th>
+                                {((props.type == "Both") || (props.type == "Pre-static")) && <th>Pre-static</th>}
+                                {((props.type == "Both") || (props.type == "Static")) && <th>Static</th>}
                                 <th>Total</th>
                             </tr>
                             </thead>
                             <tbody>
-                                {getSecurityScoreTable()}
+                                {/* {!props.loader && getSecurityScoreTable()} */}
+                                {props.loader && getSecurityScoreTable()}
                             </tbody>
                         </table>
                     </div>
@@ -148,8 +153,8 @@ function ComparisonModal(props: any) {
                 <div className="analysis">
                     <h2>Detailed Analysis</h2>
                     {props.permissions && <PermissionsAnalysis analysis={props.permissions} callback={(scoreList: any) => setPermissionsSecurityScoreList(scoreList)}/>}
-                    {props.VTanalysis && <VirusTotalAnalysis analysis={props.VTanalysis} callback={(scoreList: any) => setVTSecurityScoreList(scoreList)}/>}
-                    {props.flowdroidAnalysis && <FlowdroidAnalysis analysis={props.flowdroidAnalysis} callback={(scoreList: any) => setFlowdroidSecurityScoreList(scoreList)}/>}
+                    {((props.type == "Both") || (props.type == "Pre-static")) && props.VTanalysis && <VirusTotalAnalysis analysis={props.VTanalysis} callback={(scoreList: any) => setVTSecurityScoreList(scoreList)}/>}
+                    {((props.type == "Both") || (props.type == "Static")) && props.flowdroidAnalysis && <FlowdroidAnalysis analysis={props.flowdroidAnalysis} callback={(scoreList: any) => setFlowdroidSecurityScoreList(scoreList)}/>}
                 </div>
             </Modal.Body>
 

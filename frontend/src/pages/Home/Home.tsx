@@ -49,6 +49,9 @@ function Home(props: any) {
     
     const [permissions, setPermissions] = useState(Array<any>());
 
+    const [analysisType, setAnalysisType] = useState<string>();
+
+
     const [pageNumber, setPageNumber] = React.useState<number>(
         props.match.params.page ? parseInt(props.match.params.page, 10) : 0,
       );
@@ -103,6 +106,7 @@ function Home(props: any) {
     }
     
     function compareApps(apps: Array<AppProps>, type: string){
+        // cleanAnalysis();
         startPolling();
         fetchApps(apps, type);
     }
@@ -132,7 +136,7 @@ function Home(props: any) {
                     default:
                         break;
                 }
-                setTimeout(() => fetchApps(apps, type, false), 5000);
+                setTimeout(() => fetchApps(apps, type, false), 10000);
             } else {
                 console.log("bye");
                 setShowComparisonLoader(false);
@@ -178,9 +182,10 @@ function Home(props: any) {
     function openComparisonModal(type: string){
         document.body.style.overflow = 'hidden';
         document.getElementById("overlay")?.classList.add('active');
+        setAnalysisType(type);
         setShowComparisonLoader(true);
         setShowComparisonModal(true);
-        compareApps(checkedApps, type);
+        compareApps(checkedApps,type);
     }
 
     function closeModal(isComparisonModal=false){
@@ -294,6 +299,7 @@ function Home(props: any) {
                     VTanalysis={VTanalysis}
                     flowdroidAnalysis={flowdroidAnalysis}
                     permissions={permissions}
+                    type={analysisType}
                     onHide={() => closeModal(true)}
                     />}
                 <div className="appContainer">
