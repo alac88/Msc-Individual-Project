@@ -106,13 +106,13 @@ function Home(props: any) {
     }
     
     function compareApps(apps: Array<AppProps>, type: string){
-        // cleanAnalysis();
+        cleanAnalysis();
         startPolling();
         fetchApps(apps, type);
     }
     
     
-    function fetchApps(apps: Array<AppProps>, type: string, runScript = false){
+    function fetchApps(apps: Array<AppProps>, type: string, runScript = true){
         fetch(`http://${databaseUrl}:3001/compareApps?type=${type}&runScript=${runScript}&apps=${apps.map((app) => {return app.PACKAGE_NAME})}`)
         .then(response => {
             return response.text();
@@ -155,7 +155,10 @@ function Home(props: any) {
         })
         .then(data => {
             setPermissions(data);
-        });
+        })
+        .catch((err) => {
+            console.log(err);
+        });;
     }
    
     
@@ -166,7 +169,10 @@ function Home(props: any) {
         })
         .then(data => {
             setVTanalysis(data);
-        });
+        })
+        .catch((err) => {
+            console.log(err);
+        });;
     }
     
     function getFlowdroidAnalysis() {
@@ -176,7 +182,10 @@ function Home(props: any) {
         })
         .then(data => {
             setFlowdroidAnalysis(data);
-        });
+        })
+        .catch((err) => {
+            console.log(err);
+        });;
     }
 
     function openComparisonModal(type: string){

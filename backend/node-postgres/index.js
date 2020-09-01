@@ -59,20 +59,26 @@ app.get('/categories', (req, res) => {
 
 app.get('/VTanalysis', (req, res) => {
   fs.readdir(VTDirectoryPath, function (err, files) {
-    listVT = [];
     if (err) {
-        return console.log('Unable to scan directory: ' + err);
+      res.status(404).send();
+      return console.log('Unable to scan directory: ' + err);
     } 
+    let error = 0;
+    listVT = [];
     files.forEach(function (file) {
       try {
         let jsonContent = JSON.parse(fs.readFileSync(VTDirectoryPath + file).toString());
         listVT.push({ "name": file, "content": jsonContent});
       } catch (e){
-        console.log("Error when opening", file, ":", e);
+        res.status(404).send();
+        error = 1;
+        return console.log("Error when opening", file, ":", e);
       }
     });
-    res.send(listVT);
-    res.end();
+    if (!error){
+      res.send(listVT);
+      res.end();
+    }
   });
 })
 
@@ -81,6 +87,7 @@ app.get('/flowdroidAnalysis', (req, res) => {
     listFlowdroid = [];
     fs.readdir(flowdroidDirectoryPath, function (err, files) {
       if (err) {
+        res.status(404).send();
         return console.log('Unable to scan directory: ' + err);
       } 
       files.forEach(function (file, index, array) {
@@ -119,9 +126,10 @@ app.get('/permissions', (req, res) => {
   fullPermissionsList = [];
   fs.readdir(permissionsDirectoryPath, function (err, dirs) {
     if (err) {
+      res.status(404).send();
       return console.log('Unable to scan directory: ' + err);
     } 
-    
+    let error = 0;
     dirs.forEach(function(dir, index, array){
       var stats = fs.statSync(permissionsDirectoryPath+dir);
       var permissionsList = []
@@ -147,10 +155,12 @@ app.get('/permissions', (req, res) => {
           fullPermissionsList.push({ "name": dir, "content": permissionsList});
 
         } catch (e){
-          console.log("Error when reading directory: ", e);
+          res.status(404).send();
+          error = 1;
+          return console.log("Error when reading directory: ", e);
         }
       }
-      if (index == array.length - 1){
+      if ((index == array.length - 1) && !error){
         res.send(fullPermissionsList);
         res.end();
       }

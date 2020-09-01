@@ -129,7 +129,7 @@ function ComparisonModal(props: any) {
                 </>
 
                 }
-                {props.loader ? 
+                {!props.loader ? 
                     <div className="securityScore analysis">
                         <h2>Security Score Summary</h2>
                         <table>
@@ -143,8 +143,8 @@ function ComparisonModal(props: any) {
                             </tr>
                             </thead>
                             <tbody>
-                                {/* {!props.loader && getSecurityScoreTable()} */}
-                                {props.loader && getSecurityScoreTable()}
+                                {!props.loader && getSecurityScoreTable()}
+                                {/* {props.loader && getSecurityScoreTable()} */}
                             </tbody>
                         </table>
                     </div>
