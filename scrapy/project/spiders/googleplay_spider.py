@@ -24,7 +24,7 @@ class GooglePlaySpider(CrawlSpider):
     start_urls = ['https://play.google.com/store/apps/']
     # Create DB if not created yet
     rules = (
-        Rule(LinkExtractor(allow=('/store/apps/details?')), callback='parseUrl'),
+        Rule(LinkExtractor(allow=('/store/apps/details?')), follow=True, callback='parseUrl'),
         )
 
     def parseName(self, name):
