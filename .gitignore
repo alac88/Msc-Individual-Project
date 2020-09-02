@@ -8,5 +8,4 @@ backend/scripts/download/FlowDroid_outputs/
 backend/scripts/download/FlowDroid_processed/
 backend/scripts/download/Permissions/
 backend/scripts/download/VT_analysis/
-backend/scripts/download/chromedriver
 backend/scripts/download/samples/

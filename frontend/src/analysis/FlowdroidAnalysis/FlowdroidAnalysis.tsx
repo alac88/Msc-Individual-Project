@@ -3,40 +3,6 @@ import React, {
 } from 'react';
 import './FlowdroidAnalysis.scss';
 
-// const sourcesSinks = [
-//     "SMS_MMS",
-//     "FILE_INFORMATION",	
-//     "UNIQUE_IDENTIFIER",	
-//     "FILE",	
-//     "BLUETOOTH",	
-//     "BLUETOOTH_INFORMATION",	
-//     "EMAIL",	
-//     "VOIP",	
-//     "NETWORK",	
-//     "IMAGE",	
-//     "DATABASE_INFORMATION",	
-//     "ACCOUNT_SETTINGS",	
-//     "VIDEO",	
-//     "PHONE_CONNECTION",	
-//     "CALENDAR_INFORMATION",	
-//     "WIDGET",	
-//     "NFC",	
-//     "LOCATION_INFORMATION",	
-//     "LOG",	
-//     "BUNDLE",	
-//     "BROWSER_INFORMATION",	
-//     "SYSTEM_SETTINGS",	
-//     "AUDIO",	
-//     "NOT_EXISTING",	
-//     "IPC",	
-//     "PHONE_STATE",	
-//     "ACCOUNT_INFORMATION",	
-//     "SYNCHRONIZATION_DATA",	
-//     "CONTACT_INFORMATION",	
-//     "NO_CATEGORY",	
-//     "NETWORK_INFORMATION"
-// ]
-
 const dangerousSourcesSinks = [
     "SMS_MMS",
     "FILE_INFORMATION",	

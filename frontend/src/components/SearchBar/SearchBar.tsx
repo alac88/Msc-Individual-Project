@@ -1,5 +1,4 @@
 import React from 'react';
-// import { FormattedMessage } from 'react-intl';
 import './SearchBar.scss'
 import Counter from '../Counter';
 import CategoryList from '../CategoryList';

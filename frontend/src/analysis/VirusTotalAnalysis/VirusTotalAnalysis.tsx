@@ -42,7 +42,6 @@ function VirusTotalAnalysis(props: any){
                 <thead>
                     <tr>
                         <th scope="col">App Name</th>
-                        {/* <th scope="col">Security Score</th> */}
                         {getKeysList().map((key) => {
                             return <th key={key}>{key}</th>;
                         })}

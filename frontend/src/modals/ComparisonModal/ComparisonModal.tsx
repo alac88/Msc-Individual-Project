@@ -11,9 +11,6 @@ import PermissionsAnalysis from "../../analysis/PermissionsAnalysis";
 interface Props{
     show: any,
     loader: boolean,
-    // checkedApps: Array<JSON>,
-    // VTanalysis: Array<JSON>,
-    // flowdroidAnalysis: Array<JSON>
     onHide: any
 }
 
@@ -65,10 +62,6 @@ function ComparisonModal(props: any) {
     }
 
     function getSecurityScoreTable(){
-        // console.log("hello");
-        // console.log("permissionsSecurityScoreList: ", permissionsSecurityScoreList);
-        // console.log("VTSecurityScoreList: ", VTSecurityScoreList);
-        // console.log("flowdroidSecurityScoreList: ", flowdroidSecurityScoreList);
         if (
             ((props.type == "Both") && ((permissionsSecurityScoreList.length == VTSecurityScoreList.length) && (permissionsSecurityScoreList.length == flowdroidSecurityScoreList.length))) ||
             ((props.type == "Pre-static") && (permissionsSecurityScoreList.length == VTSecurityScoreList.length)) ||

@@ -91,11 +91,9 @@ function PermissionsAnalysis(props: any){
                 let nbDangerousPermissions = 0;
                 props.analysis[i].content.map((permission: string) => {
                     if (dangerousPermissions.includes(permission) || permission.includes("/dangerous")){
-                        // console.log(permission);
                         nbDangerousPermissions++;
                     }
                 })
-                // console.log(props.analysis[i].name, nbDangerousPermissions);
                 score = Math.exp(-nbDangerousPermissions / 8);
                 scoreList.push({"name": props.analysis[i].name, "score": Math.round(score*10)/10});
                 i++;
@@ -111,7 +109,6 @@ function PermissionsAnalysis(props: any){
                 <thead>
                     <tr>
                         <th scope="col">App Name</th>
-                        {/* <th scope="col">Security Score</th> */}
                         {getKeysList().map((key) => {
                             return <th key={key}>{key}</th>;
                         })}

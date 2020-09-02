@@ -10,10 +10,8 @@ const RootComponentWithRoutes: React.FunctionComponent = () => (
     <Routes />
 );
 
-// const App: React.FunctionComponent<History> = ( history ) => (
 const App: React.FunctionComponent =  () => (
 
-    // <ConnectedRouter  history={history}>
         <Router>
             <Route path="/" component={RootComponentWithRoutes} />
             <div id="overlay"></div>

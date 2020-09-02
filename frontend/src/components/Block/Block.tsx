@@ -40,7 +40,6 @@ function Block(props: Props){
         <div className="blockContainer">
             <a href={props.url}>
                 <div className="topSection">{renderImageSwitch()}</div>
-                {/* <div className="topSection"></div> */}
                 <div className="bottomSection">{renderTextSwitch()}</div>
             </a>
         </div>
