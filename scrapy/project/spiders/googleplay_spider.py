@@ -8,18 +8,23 @@ from scrapy.linkextractors import LinkExtractor
 from scrapy.http.request import Request
 from project.items import GooglePlayItem
 
+### Change if necessary ###
 HOST = "localhost"
 USER = "postgres"
 PASSWORD = "testdb"
 DATABASE = "imperial"
+TABLE = "project"
 PORT = "5432"
+##########################
 
 class GooglePlaySpider(CrawlSpider):
     name = "googleplay"
+    check = False
     allowed_domains = ["play.google.com", "apkpure.com"]
     start_urls = ['https://play.google.com/store/apps/']
+    # Create DB if not created yet
     rules = (
-        Rule(LinkExtractor(allow=('/store/apps/details?')), follow=True, callback='parseUrl'),
+        Rule(LinkExtractor(allow=('/store/apps/details?')), callback='parseUrl'),
         )
 
     def parseName(self, name):
@@ -27,7 +32,10 @@ class GooglePlaySpider(CrawlSpider):
 
 
     def parseUrl(self, response):
-
+        
+        if not self.check:
+            self.isTableCreated()
+        
         item = GooglePlayItem()
         parsed = urlparse.urlparse(response.request.url)
 
@@ -72,6 +80,34 @@ class GooglePlaySpider(CrawlSpider):
         
         return item
 
+    def isTableCreated(self):
+
+        conn = psycopg2.connect("host=%s dbname=%s user=%s password=%s port=%s" % (HOST, DATABASE, USER, PASSWORD, PORT))
+        cur = conn.cursor()
+        
+        cur.execute('CREATE TABLE IF NOT EXISTS ' + TABLE + ' ( \
+            "ID" serial,\
+            "PACKAGE_NAME" text,\
+            "NAME_APP" text,\
+            "UPDATED" date,\
+            "SIZE_APP" text,\
+            "INSTALLS" text,\
+            "VERSION_APP" text,\
+            "ANDROID_MIN_VERSION" text,\
+            "OFFERED_BY" text,\
+            "RATINGS" numeric(9,2),\
+            "RATINGS_NUMBER" text,\
+            "CATEGORY" text,\
+            "PRICE" numeric(9,2),\
+            "APK_URL" text,\
+            "APK_URL_STATUS" numeric(9,2),\
+            PRIMARY KEY( "ID" )\
+            )')
+
+        conn.commit()
+        conn.close()
+        self.check = True
+
     def isUpToDate(self, packageName, version):
 
         conn = psycopg2.connect("host=%s dbname=%s user=%s password=%s port=%s" % (HOST, DATABASE, USER, PASSWORD, PORT))
@@ -79,12 +115,12 @@ class GooglePlaySpider(CrawlSpider):
 
         cur = conn.cursor()
 
-        sql_name = "SELECT \"ID\" from project WHERE \"PACKAGE_NAME\"='%s'" % (packageName)
+        sql_name = "SELECT \"ID\" from " + TABLE + " WHERE \"PACKAGE_NAME\"='%s'" % (packageName)
         cur.execute(sql_name)
         id_name = cur.fetchone()
 
         if id_name:
-            sql_version = "SELECT \"ID\" from project WHERE \"PACKAGE_NAME\"='%s' AND \"VERSION_APP\"='%s'" % (packageName, version)
+            sql_version = "SELECT \"ID\" from " + TABLE + " WHERE \"PACKAGE_NAME\"='%s' AND \"VERSION_APP\"='%s'" % (packageName, version)
             cur.execute(sql_version)
             id_version = cur.fetchone()
 
@@ -108,7 +144,7 @@ class GooglePlaySpider(CrawlSpider):
 
         cur = conn.cursor()
 
-        sql = "INSERT INTO project(\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\", \"APK_URL_STATUS\") VALUES ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s', %d)" % (item["PackageName"], item["Name"][0].replace("'", " ").replace('"', ' '), item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", " ")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(" Buy", "").replace("€", "")), item["APK_URL"], item["APK_URL_STATUS"])
+        sql = "INSERT INTO " + TABLE + "(\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\", \"APK_URL_STATUS\") VALUES ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s', %d)" % (item["PackageName"], item["Name"][0].replace("'", " ").replace('"', ' '), item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", " ")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(" Buy", "").replace("€", "")), item["APK_URL"], item["APK_URL_STATUS"])
         cur.execute(sql)
 
         conn.commit()
@@ -122,7 +158,7 @@ class GooglePlaySpider(CrawlSpider):
 
         cur = conn.cursor()
 
-        sql = "UPDATE project SET (\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\", \"APK_URL_STATUS\") = ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s', %d)" % (item["PackageName"], item["Name"][0].replace("'", " ").replace('"', ' '), item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(",", ".")), item["APK_URL"], item["APK_URL_STATUS"])
+        sql = "UPDATE " + TABLE + " SET (\"PACKAGE_NAME\",\"NAME_APP\", \"UPDATED\", \"SIZE_APP\", \"INSTALLS\", \"VERSION_APP\", \"ANDROID_MIN_VERSION\", \"OFFERED_BY\", \"RATINGS\", \"RATINGS_NUMBER\", \"CATEGORY\", \"PRICE\", \"APK_URL\", \"APK_URL_STATUS\") = ('%s','%s', '%s', '%s', '%s', '%s', '%s', '%s', %f, '%s', '%s', %f, '%s', %d)" % (item["PackageName"], item["Name"][0].replace("'", " ").replace('"', ' '), item["Updated"][0], item["Size"][0], item["Installs"][0], item["Version"][0], item["AndroidMinVersion"][0], item["OfferedBy"][0], float(item["Ratings"][0].replace(",", ".")), item["RatingsNumber"][0], item["Category"][0], float(item["Price"][0].replace(",", ".")), item["APK_URL"], item["APK_URL_STATUS"])
         cur.execute(sql)
 
         conn.commit()
